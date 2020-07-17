@@ -5,8 +5,7 @@ workspace "Cyber-2D"
 	configurations
 	{
 		"Debug",
-		"Release",
-		"Dist"
+		"Release"
 	}
 
 	flags
@@ -176,10 +175,5 @@ project "Cyber-Editor"
 
 	filter "configurations:Release"
 		defines "CB_RELEASE"
-		runtime "Release"
-		optimize "on"
-
-	filter "configurations:Dist"
-		defines "CB_DIST"
 		runtime "Release"
 		optimize "on"

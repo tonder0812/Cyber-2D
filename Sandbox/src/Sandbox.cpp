@@ -5,6 +5,9 @@ class Sandbox : public Cyber::Application
 {
 public:
 	Sandbox(){
+		#ifdef CB_DEBUG
+		name = "Sandbox";
+		#endif
 		CB_INFO("STARTING SANDBOX");
 	}
 	~Sandbox() {
