@@ -82,6 +82,7 @@ project "Cyber-2D"
 
 		defines
 		{
+      "CB_PLATFORM_WINDOWS"
 		}
 
 	filter "configurations:Debug"

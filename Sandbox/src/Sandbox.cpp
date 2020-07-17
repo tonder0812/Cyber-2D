@@ -13,10 +13,6 @@ public:
 	~Sandbox() {
 
 	}
-	void Run() {
-		CB_TRACE("Run");
-		while (true);
-	}
 private:
 };
 
