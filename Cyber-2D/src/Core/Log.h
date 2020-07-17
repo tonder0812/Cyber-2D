@@ -26,9 +26,9 @@ namespace Cyber {
 #define CB_CORE_CRITICAL(...) ::Cyber::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
 // Client log macros
-#define CB_TRACE(...)         ::Hazel::Log::GetClientLogger()->trace(__VA_ARGS__)
-#define CB_INFO(...)          ::Hazel::Log::GetClientLogger()->info(__VA_ARGS__)
-#define CB_WARN(...)          ::Hazel::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define CB_ERROR(...)         ::Hazel::Log::GetClientLogger()->error(__VA_ARGS__)
-#define CB_CRITICAL(...)      ::Hazel::Log::GetClientLogger()->critical(__VA_ARGS__)
+#define CB_TRACE(...)         ::Cyber::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define CB_INFO(...)          ::Cyber::Log::GetClientLogger()->info(__VA_ARGS__)
+#define CB_WARN(...)          ::Cyber::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define CB_ERROR(...)         ::Cyber::Log::GetClientLogger()->error(__VA_ARGS__)
+#define CB_CRITICAL(...)      ::Cyber::Log::GetClientLogger()->critical(__VA_ARGS__)
 
