@@ -1,0 +1,12 @@
+[submodule "Cyber-2D/vendor/GLFW"]
+	path = Cyber-2D/vendor/GLFW
+	url = https://github.com/TheCherno/glfw
+[submodule "Cyber-2D/vendor/imgui"]
+	path = Cyber-2D/vendor/imgui
+	url = https://github.com/TheCherno/imgui
+[submodule "Cyber-2D/vendor/spdlog"]
+	path = Cyber-2D/vendor/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "Cyber-2D/vendor/glm"]
+	path = Cyber-2D/vendor/glm
+	url = https://github.com/g-truc/glm
