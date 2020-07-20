@@ -11,9 +11,9 @@ namespace Cyber {
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
-	#ifdef CB_DEBUG
 	struct Event {
 		EventType Type;
+		virtual ~Event() = default;
 		virtual std::string getName() const { return "Event"; }
 	};
 
@@ -21,14 +21,5 @@ namespace Cyber {
 	{
 		return os << e.getName();
 	}
-	#else
-	struct Event {
-		EventType Type;
-	};
-	inline std::ostream& operator<<(std::ostream& os, const Event& e)
-	{
-		return os;
-	}
-	#endif
 }
 

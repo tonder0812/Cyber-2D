@@ -5,7 +5,8 @@ workspace "Cyber-2D"
 	configurations
 	{
 		"Debug",
-		"Release"
+		"Release",
+		"Dist"
 	}
 
 	flags
@@ -86,11 +87,16 @@ project "Cyber-2D"
 		}
 
 	filter "configurations:Debug"
-		defines "CB_DEBUG"
+		defines {"CB_DEBUG","CB_CONSOLE"}
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
+		defines {"CB_RELEASE","CB_CONSOLE"}
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
 		defines "CB_RELEASE"
 		runtime "Release"
 		optimize "on"
@@ -128,11 +134,16 @@ project "Sandbox"
 		systemversion "latest"
 
 	filter "configurations:Debug"
-		defines "CB_DEBUG"
+		defines {"CB_DEBUG","CB_CONSOLE"}
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
+		defines {"CB_RELEASE","CB_CONSOLE"}
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
 		defines "CB_RELEASE"
 		runtime "Release"
 		optimize "on"
@@ -170,11 +181,16 @@ project "Cyber-Editor"
 		systemversion "latest"
 
 	filter "configurations:Debug"
-		defines "CB_DEBUG"
+		defines {"CB_DEBUG","CB_CONSOLE"}
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
+		defines {"CB_RELEASE","CB_CONSOLE"}
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
 		defines "CB_RELEASE"
 		runtime "Release"
 		optimize "on"

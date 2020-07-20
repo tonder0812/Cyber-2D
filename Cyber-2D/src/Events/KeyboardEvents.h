@@ -26,13 +26,13 @@ namespace Cyber {
 		bool NumLockEnabled() {
 			return mods & CB_MOD_NUM_LOCK;
 		}
-		#ifdef CB_DEBUG
+		
 		std::string getName()const override {
 			std::stringstream s;
 			s << "Key Pressed Event KeyCode: " << key << " Repeat: " << repeat;
 			return s.str();
 		}
-		#endif
+		
 	};
 
 	struct KeyReleasedEvent :public Event {
@@ -41,13 +41,13 @@ namespace Cyber {
 			key(key_), mods(mods_) {
 			Type = EventType::KeyReleased;
 		}
-		#ifdef CB_DEBUG
+		
 		std::string getName()const override {
 			std::stringstream s;
 			s << "Key Released Event KeyCode: " << key;
 			return s.str();
 		}
-		#endif
+		
 	};
 
 	struct KeyTypedEvent : public Event {
@@ -56,12 +56,12 @@ namespace Cyber {
 			key(key_) {
 			Type = EventType::KeyTyped;
 		}
-		#ifdef CB_DEBUG
+		
 		std::string getName()const override {
 			std::stringstream s;
 			s << "Key Typed Event KeyCode: " << key;
 			return s.str();
 		}
-		#endif
+		
 	};
 }
