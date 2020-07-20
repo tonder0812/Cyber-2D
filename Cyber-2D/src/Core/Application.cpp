@@ -4,12 +4,33 @@
 #include "GLFW\glfw3.h"
 #include "glad\glad.h"
 
+
 namespace Cyber {
-	Window* m_Window;
-	bool m_Runnig;
 	Application::Application() {
-		m_Window = new Window(WindowProps("TEST",400,400));
+		m_Window = new Window(WindowProps("TEST", 400, 400));
+		m_Window->SetEventCallback([this](const Event* e) {
+			CB_CORE_TRACE(*e);
+			switch (e->Type)
+			{
+			case EventType::WindowClose: {
+				onWindowClose();
+				break;
+			}
+			case EventType::WindowResize:{
+				const WindowResizeEvent* ev = dynamic_cast<const WindowResizeEvent*>(e);
+				glViewport(0, 0, ev->width, ev->height);
+				m_Window->onUpdate();
+				break;
+			}
+			default:
+				break;
+			}
+			delete e;
+			});
+
+
 		m_Runnig = true;
+
 	}
 	Application::~Application() {
 		delete m_Window;
@@ -20,6 +41,11 @@ namespace Cyber {
 			glClearColor(1, 0, 0, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 			m_Window->onUpdate();
-		}
-	};
+		};
+	}
+
+	bool Application::onWindowClose() {	
+		m_Runnig = false;
+		return true;
+	}
 }

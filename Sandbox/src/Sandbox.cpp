@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "Cyber.h"
 
 class Sandbox : public Cyber::Application

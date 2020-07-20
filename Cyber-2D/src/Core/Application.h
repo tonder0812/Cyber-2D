@@ -1,4 +1,6 @@
 #pragma once
+#include "Window.h"
+
 
 namespace Cyber {
 	class Application {
@@ -9,7 +11,11 @@ namespace Cyber {
 		#ifdef CB_DEBUG
 		std::string name;
 		#endif
-		
+
+	private:
+		Window* m_Window;
+		bool m_Runnig;
+		bool onWindowClose();
 	};
 }
 

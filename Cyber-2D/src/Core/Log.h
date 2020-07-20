@@ -1,4 +1,5 @@
-#include "pch.h"
+#pragma once
+#include <memory>
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
