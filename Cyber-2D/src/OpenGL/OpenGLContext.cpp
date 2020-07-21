@@ -23,6 +23,13 @@ namespace Cyber {
 		CB_CORE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
 		CB_CORE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
 		CB_CORE_INFO("  Version: {0}", glGetString(GL_VERSION));
+
+		int versionMajor;
+		int versionMinor;
+		glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
+		glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
+
+		CB_CORE_WARN("GL Version {0}.{1}", versionMajor, versionMinor);
 	}
 
 	void OpenGLContext::SwapBuffers()

@@ -29,6 +29,11 @@ namespace Cyber {
 			if (!success)
 				CB_CORE_ERROR("Failed to initialize GLFW");
 			glfwSetErrorCallback(GLFWErrorCallback);
+			#ifdef CB_DEBUG
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			#endif
+
+
 		}
 
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.props.Title.c_str(), nullptr, nullptr);
