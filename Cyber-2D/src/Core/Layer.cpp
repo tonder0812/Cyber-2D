@@ -30,7 +30,7 @@ namespace Cyber {
 
 	void LayerStack::onUpdate() {
 		for (Layer* layer : m_Stack) {
-			CB_CORE_INFO("LAYER {0} UPDATED", layer->name);
+			//CB_CORE_INFO("LAYER {0} UPDATED", layer->name);
 			layer->onUpdate();
 		}
 	}

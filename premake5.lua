@@ -122,7 +122,8 @@ project "Sandbox"
 		"Cyber-2D/vendor/spdlog/include",
 		"Cyber-2D/src",
 		"Cyber-2D/vendor",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.ImGui}"
 	}
 
 	links

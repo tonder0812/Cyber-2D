@@ -4,9 +4,13 @@
 class DemoLayer : public Cyber::Layer {
 public:
 	DemoLayer() :
-		Layer("Demo") {};
+		Layer("Example Layer") {
+	};
+	void onAttach() override;
+	void onDetach() override;
 	void onImGUI() override;
-	void onUpdate();
+	void onUpdate() override;
 private:
-	glm::vec3 m_Color = { 0,0,0 };
+	glm::vec3 m_Color = { 1.0f,0,0 };
+	unsigned int m_VertexArr, m_VertexBuff, m_IndexBuff,m_program;
 };

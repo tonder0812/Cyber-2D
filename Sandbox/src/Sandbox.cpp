@@ -6,6 +6,7 @@ class Sandbox : public Cyber::Application
 {
 public:
 	Sandbox(){
+		//Application();
 		name = "Sandbox";
 		CB_INFO("STARTING SANDBOX");
 		pushLayer(new DemoLayer());

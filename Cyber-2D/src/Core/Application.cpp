@@ -18,7 +18,7 @@ namespace Cyber {
 		m_LayerStack = LayerStack(this);
 		m_Window = new Window(WindowProps("TEST", 400, 400));
 		m_Window->SetEventCallback([this](const Event* e) {
-			CB_CORE_TRACE(*e);
+			//CB_CORE_TRACE(*e);
 			switch (e->Type)
 			{
 			case EventType::WindowClose: {
@@ -50,11 +50,8 @@ namespace Cyber {
 			m_LayerStack.onEvent(e);
 			delete e;
 			});
-		CB_CORE_TRACE("BEFORE IMGUI");
 		m_ImGuiLayer = new ImGUILayer();
-		CB_CORE_TRACE("MID IMGUI");
 		m_LayerStack.pushLayer(m_ImGuiLayer);
-		CB_CORE_TRACE("AFTER IMGUI");
 		m_Runnig = true;
 
 	}
@@ -66,6 +63,8 @@ namespace Cyber {
 	void Application::Run() {
 		CB_CORE_TRACE("RUN");
 		while (m_Runnig) {
+			glClearColor(0, 0, 0, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
 			/*if (mousePressed)
 			{
 				glClearColor(mouseX / m_Window->GetWidth(), mouseY / m_Window->GetHeight(), 1, 1);
