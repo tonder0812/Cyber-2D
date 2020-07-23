@@ -1,5 +1,7 @@
 #pragma once
 #include <glm\glm.hpp>
+#include "OpenGL\OpenGLBuffer.h"
+#include "OpenGL\OpenGLShader.h"
 
 class DemoLayer : public Cyber::Layer {
 public:
@@ -12,5 +14,8 @@ public:
 	void onUpdate() override;
 private:
 	glm::vec3 m_Color = { 1.0f,0,0 };
-	unsigned int m_VertexArr, m_VertexBuff, m_IndexBuff,m_program;
+	unsigned int m_VertexArr;
+	Cyber::VertexBuffer* m_VertexBuff;
+	Cyber::IndexBuffer* m_IndexBuff;
+	Cyber::Shader* m_Shader;
 };

@@ -38,6 +38,10 @@ namespace Cyber {
 		bool Close() {
 			return m_Stack->Close();
 		};
-
 	};
+}
+
+inline std::ostream& operator<< (std::ostream& os, const Cyber::Layer& l) {
+	os << l.name;
+	return os;
 }

@@ -5,10 +5,13 @@
 namespace Cyber {
 	LayerStack::LayerStack(Application* app) :
 		m_Application(app) {
+		CB_CORE_WARN("LAYER STACK CONSTRUCTOR From app pointer: {0}",(void*)app);
 	}
 	LayerStack::~LayerStack() {
 		for (Layer* layer : m_Stack) {
+			CB_CORE_WARN("LAYER {0} POPPED", *layer);
 			layer->onDetach();
+			CB_CORE_WARN("LAYER {0} DELETED",*layer);
 			delete layer;
 		}
 	}
@@ -16,6 +19,7 @@ namespace Cyber {
 	void LayerStack::pushLayer(Layer* layer)
 	{
 		m_Stack.emplace_back(layer);
+		CB_CORE_WARN("LAYER {0} PUSHED",*layer);
 		layer->onAttach();
 	}
 
@@ -23,8 +27,11 @@ namespace Cyber {
 		auto it = std::find(m_Stack.begin() , m_Stack.end(), layer);
 		if (it!=m_Stack.end())
 		{
+			CB_CORE_WARN("LAYER {0} POPPED",*layer);
 			layer->onDetach();
 			m_Stack.erase(it);
+			CB_CORE_WARN("LAYER {0} DELETED", *layer);
+			delete layer;
 		}
 	}
 

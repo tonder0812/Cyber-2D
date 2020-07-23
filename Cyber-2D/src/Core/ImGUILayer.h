@@ -6,6 +6,7 @@ namespace Cyber {
 	class ImGUILayer : public Layer
 	{
 	public:
+		ImGUILayer() :Layer("ImGui Layer") {};
 		void onAttach() override;
 		void onDetach() override;
 		bool onEvent(const Event* e) override;
