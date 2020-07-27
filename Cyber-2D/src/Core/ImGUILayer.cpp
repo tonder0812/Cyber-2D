@@ -51,13 +51,19 @@ namespace Cyber {
 
 	bool ImGUILayer::onEvent(const Event* e)
 	{
+		bool handled = false;
 		if (m_BlockEvents)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			//e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
-			//e.Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+			handled |= (e->Type==EventType::MouseMoved ||
+				e->Type == EventType::MouseButtonPressed ||
+				e->Type == EventType::MouseButtonReleased ||
+				e->Type == EventType::MouseScrolled) & io.WantCaptureMouse;
+			handled |= (e->Type == EventType::KeyPressed || 
+				e->Type == EventType::KeyReleased || 
+				e->Type == EventType::KeyTyped) & io.WantCaptureKeyboard;
 		}
-		return false;
+		return handled;
 	}
 
 	void ImGUILayer::Begin()

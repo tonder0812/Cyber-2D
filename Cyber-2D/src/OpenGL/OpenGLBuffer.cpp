@@ -83,7 +83,8 @@ namespace Cyber {
 
 	void BufferLayout::Bind() const {
 
-		uint32_t i = 0, offset = 0;
+		GLuint i = 0;
+		void *offset = 0;
 		for (BufferElement e : m_Elements) {
 			glEnableVertexAttribArray(i);
 			glVertexAttribPointer(i, e.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(e.Type), e.Normalized? GL_TRUE : GL_FALSE, e.Size, (const void *)offset);

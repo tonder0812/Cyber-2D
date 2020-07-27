@@ -12,7 +12,8 @@ namespace Cyber {
 	};
 
 	struct Event {
-		EventType Type;
+		EventType Type=EventType::None;
+		Event():Type(EventType::None){}
 		virtual ~Event() = default;
 		virtual std::string getName() const { return "Event"; }
 	};

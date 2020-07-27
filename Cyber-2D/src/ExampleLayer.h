@@ -6,16 +6,20 @@
 class DemoLayer : public Cyber::Layer {
 public:
 	DemoLayer() :
-		Layer("Example Layer") {
+		Layer("Example Layer"), m_VertexBuff(nullptr), m_IndexBuff(nullptr), m_Shader(nullptr) {
 	};
 	void onAttach() override;
 	void onDetach() override;
 	void onImGUI() override;
 	void onUpdate() override;
+	bool onEvent(const Cyber::Event* e) override;
 private:
 	glm::vec3 m_Color = { 1.0f,0,0 };
-	unsigned int m_VertexArr;
-	Cyber::VertexBuffer* m_VertexBuff;
-	Cyber::IndexBuffer* m_IndexBuff;
-	Cyber::Shader* m_Shader;
+	glm::mat4 m_Camera = glm::mat4(1);
+	Cyber::VertexBuffer* m_VertexBuff = nullptr;
+	Cyber::IndexBuffer* m_IndexBuff = nullptr;
+	Cyber::Shader* m_Shader = nullptr;
+
+	glm::vec3 cameraPos = { 0,0,0 };
+	float cameraSpeed = 10.0f;
 };

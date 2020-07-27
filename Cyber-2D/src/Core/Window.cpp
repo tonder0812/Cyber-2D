@@ -90,7 +90,7 @@ namespace Cyber {
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-				Event* e;
+				Event* e = nullptr;
 				switch (action)
 				{
 				case GLFW_PRESS:
@@ -108,6 +108,9 @@ namespace Cyber {
 					e = new KeyPressedEvent(key,mods, true);
 					break;
 				}
+				default: {
+					e = new Event();
+				}
 				}
 				data.onEvent(e);
 			});
@@ -124,7 +127,7 @@ namespace Cyber {
 		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-				Event* e;
+				Event* e=nullptr;
 				switch (action)
 				{
 				case GLFW_PRESS:
@@ -136,6 +139,9 @@ namespace Cyber {
 				{
 					e = new MouseReleasedEvent(button);
 					break;
+				}
+				default: {
+					e = new Event();
 				}
 				}
 				data.onEvent(e);

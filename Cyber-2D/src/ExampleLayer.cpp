@@ -8,28 +8,28 @@
 
 void DemoLayer::onAttach() {
 	float vert[] = {
-		-0.5f , -0.5f , 0,
-		 0.5f , -0.5f , 0,
-		 0.5f ,  0.5f , 0,
-		-0.5f ,  0.5f , 0
+		-190.0f , -190.0f , 0,
+		 190.0f , -190.0f , 0,
+		 190.0f ,  190.0f , 0,
+		-190.0f ,  190.0f , 0
 	};
-	m_VertexBuff = new Cyber::VertexBuffer(vert,sizeof(vert));
+	m_VertexBuff = new Cyber::VertexBuffer(vert, sizeof(vert));
 	Cyber::BufferLayout Layout = {
 		{Cyber::ShaderDataType::Float3,"a_Position"}
 	};
 	Layout.Bind();
 	m_VertexBuff->SetLayout(Layout);
 	uint32_t indices[] = { 0,1,2,2,3,0 };
-	m_IndexBuff = new Cyber::IndexBuffer(indices, sizeof(indices)/sizeof(uint32_t));
-
+	m_IndexBuff = new Cyber::IndexBuffer(indices, sizeof(indices) / sizeof(uint32_t));
 
 	std::string vertexSource = R"(
 		#version 330 core
 
 		layout(location=0) in vec3 a_pos;
+		uniform mat4 u_camera;
 
 		void main(){
-			gl_Position=vec4(a_pos,1.0);
+			gl_Position=u_camera*vec4(a_pos,1.0);
 		}
 	)";
 	std::string fragmentSource = R"(
@@ -58,9 +58,37 @@ void DemoLayer::onImGUI() {
 	//ImGui::ShowDemoWindow();
 }
 void DemoLayer::onUpdate() {
+	if (Cyber::Input::IsKeyPressed(CB_KEY_UP))
+		cameraPos.y += cameraSpeed;
+	if (Cyber::Input::IsKeyPressed(CB_KEY_DOWN))
+		cameraPos.y -= cameraSpeed;
+	if (Cyber::Input::IsKeyPressed(CB_KEY_RIGHT))
+		cameraPos.x += cameraSpeed;
+	if (Cyber::Input::IsKeyPressed(CB_KEY_LEFT))
+		cameraPos.x -= cameraSpeed;
+	uint32_t width = Cyber::Application::Get().GetWindow()->GetWidth();
+	uint32_t height = Cyber::Application::Get().GetWindow()->GetHeight();
+	m_Camera = glm::translate(glm::ortho(-(width / 2.0f), width / 2.0f, -(height / 2.0f), height / 2.0f, -1.0f, 1.0f), cameraPos);
 	m_Shader->Bind();
 	m_Shader->UploadUniformFloat3("u_color", m_Color);
+	m_Shader->UploadUniformMat4("u_camera", m_Camera);
 	m_VertexBuff->Bind();
 	m_IndexBuff->Bind();
 	glDrawElements(GL_TRIANGLES, m_IndexBuff->GetCount(), GL_UNSIGNED_INT, nullptr);
+}
+
+bool DemoLayer::onEvent(const Cyber::Event* e) {
+	if (e->Type == Cyber::EventType::KeyPressed)
+	{
+		Cyber::KeyPressedEvent* ev = (Cyber::KeyPressedEvent*)e;
+		switch (ev->key)
+		{
+		case CB_KEY_ESCAPE:
+			Close();
+			break;
+		default:
+			break;
+		}
+	}
+	return false;
 }

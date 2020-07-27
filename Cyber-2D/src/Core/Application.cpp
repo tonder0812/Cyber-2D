@@ -15,7 +15,7 @@ namespace Cyber {
 			CB_CORE_CRITICAL("Aplication Already Open");
 		}
 		s_Instance = this;
-		m_LayerStack = LayerStack(this);
+		m_LayerStack = LayerStack();
 		m_Window = new Window(WindowProps("TEST", 400, 400));
 		m_Window->SetEventCallback([this](const Event* e) {
 			//CB_CORE_TRACE(*e);
@@ -28,6 +28,10 @@ namespace Cyber {
 			case EventType::WindowResize: {
 				const WindowResizeEvent* ev = dynamic_cast<const WindowResizeEvent*>(e);
 				glViewport(0, 0, ev->width, ev->height);
+				m_LayerStack.onUpdate();
+				m_ImGuiLayer->Begin();
+				m_LayerStack.onImGUI();
+				m_ImGuiLayer->End();
 				m_Window->onUpdate();
 				break;
 			}
