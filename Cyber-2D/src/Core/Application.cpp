@@ -55,18 +55,19 @@ namespace Cyber {
 			delete e;
 			});
 		m_ImGuiLayer = new ImGUILayer();
-		m_LayerStack.pushLayer(m_ImGuiLayer);
+		m_LayerStack.pushOverlay(m_ImGuiLayer);
 		m_Runnig = true;
 
 	}
 	Application::~Application() {
-		m_LayerStack.popLayer(m_ImGuiLayer);
+		m_LayerStack.popOverlay(m_ImGuiLayer);
 		delete m_Window;
 	}
 
 	void Application::Run() {
 		CB_CORE_TRACE("RUN");
 		while (m_Runnig) {
+			CB_CORE_TRACE("Time since start: {0}s",glfwGetTime());
 			glClearColor(0, 0, 0, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 			/*if (mousePressed)

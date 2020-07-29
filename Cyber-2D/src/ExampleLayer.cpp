@@ -2,6 +2,7 @@
 #include "Cyber.h"
 #include <imgui.h>
 #include "ExampleLayer.h"
+#include "Core\Application.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -59,13 +60,13 @@ void DemoLayer::onImGUI() {
 }
 void DemoLayer::onUpdate() {
 	if (Cyber::Input::IsKeyPressed(CB_KEY_UP))
-		cameraPos.y += cameraSpeed;
-	if (Cyber::Input::IsKeyPressed(CB_KEY_DOWN))
 		cameraPos.y -= cameraSpeed;
+	if (Cyber::Input::IsKeyPressed(CB_KEY_DOWN))
+		cameraPos.y += cameraSpeed;
 	if (Cyber::Input::IsKeyPressed(CB_KEY_RIGHT))
-		cameraPos.x += cameraSpeed;
-	if (Cyber::Input::IsKeyPressed(CB_KEY_LEFT))
 		cameraPos.x -= cameraSpeed;
+	if (Cyber::Input::IsKeyPressed(CB_KEY_LEFT))
+		cameraPos.x += cameraSpeed;
 	uint32_t width = Cyber::Application::Get().GetWindow()->GetWidth();
 	uint32_t height = Cyber::Application::Get().GetWindow()->GetHeight();
 	m_Camera = glm::translate(glm::ortho(-(width / 2.0f), width / 2.0f, -(height / 2.0f), height / 2.0f, -1.0f, 1.0f), cameraPos);
@@ -85,6 +86,15 @@ bool DemoLayer::onEvent(const Cyber::Event* e) {
 		{
 		case CB_KEY_ESCAPE:
 			Close();
+			break;
+		case CB_KEY_E:
+			Cyber::Application::Get().GetWindow()->SetVSync(false);
+			break;
+		case CB_KEY_Q:
+			Cyber::Application::Get().GetWindow()->SetVSync(true);
+			break;
+		case CB_KEY_T:
+			Cyber::Application::Get().GetWindow()->SetVSync(!Cyber::Application::Get().GetWindow()->GetVSync());
 			break;
 		default:
 			break;

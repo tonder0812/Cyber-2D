@@ -43,6 +43,7 @@ namespace Cyber {
 		uint32_t GetHeight()const { return m_Data.props.Height; };
 		void SetEventCallback(const EventCallbackFn& callback);
 		void SetVSync(bool enabled);
+		bool GetVSync() { return m_Data.props.Vsync; };
 		bool IsVSync() const { return m_Data.props.Vsync; }
 		GLFWwindow* GetNativeWindow() const { return m_Window; }
 

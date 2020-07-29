@@ -4,7 +4,6 @@
 
 namespace Cyber {
 	class Layer;
-	class Application;
 
 	class LayerStack
 	{
@@ -13,12 +12,14 @@ namespace Cyber {
 		~LayerStack();
 		void pushLayer(Layer* layer);
 		void popLayer(Layer* layer);
+		void pushOverlay(Layer* layer);
+		void popOverlay(Layer* layer);
 		void onUpdate();
 		void onEvent(const Event *e);
 		void onImGUI();
 	private:
-		Application* m_Application;
 		std::vector<Layer*> m_Stack;
+		std::vector<Layer*> m_Overlays;
 	};
 	class Layer
 	{
