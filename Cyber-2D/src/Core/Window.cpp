@@ -21,6 +21,8 @@ namespace Cyber {
 	}
 
 	void Window::Init(WindowProps props) {
+		
+
 		m_Data.props = props;
 		CB_CORE_INFO("New window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 		if (s_WindowCount == 0)
@@ -36,7 +38,23 @@ namespace Cyber {
 
 		}
 
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.props.Title.c_str(), nullptr, nullptr);
+		if (props.fullscreen)
+		{
+			GLFWmonitor *monitor=glfwGetPrimaryMonitor();
+			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+			glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+			glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+			glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+			glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+			
+			m_Data.props.Width = mode->width;
+			m_Data.props.Height = mode->height;
+			m_Window = glfwCreateWindow(mode->width, mode->height, m_Data.props.Title.c_str(), monitor, nullptr);
+		}
+		else {
+			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.props.Title.c_str(), nullptr, nullptr);
+		}
 		++s_WindowCount;
 
 		m_Context = std::make_unique<OpenGLContext>(OpenGLContext(m_Window));

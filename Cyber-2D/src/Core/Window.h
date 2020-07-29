@@ -15,12 +15,18 @@ namespace Cyber {
 		uint32_t Width;
 		uint32_t Height;
 		bool Vsync;
+		bool fullscreen;
 
-		WindowProps(const std::string& title = "Cyber Engine",
-			uint32_t width = 1280,
-			uint32_t height = 720,
+		WindowProps(uint32_t width,
+			uint32_t height, 
+			const std::string& title = "Cyber Engine",
 			bool vsync=true)
-			: Title(title), Width(width), Height(height),Vsync(vsync)
+			: Title(title), Width(width), Height(height),Vsync(vsync),fullscreen(false)
+		{
+		}
+		WindowProps(const std::string& title = "Cyber Engine",bool full=true,
+			bool vsync = true)
+			: Title(title), Width(0), Height(0), Vsync(vsync),fullscreen(full)
 		{
 		}
 		

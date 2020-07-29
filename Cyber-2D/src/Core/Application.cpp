@@ -10,13 +10,14 @@ namespace Cyber {
 	bool mousePressed = false;
 	Application* Application::s_Instance = nullptr;
 	Application::Application() {
-		if (s_Instance!=nullptr)
+		if (s_Instance != nullptr)
 		{
 			CB_CORE_CRITICAL("Aplication Already Open");
 		}
 		s_Instance = this;
 		m_LayerStack = LayerStack();
-		m_Window = new Window(WindowProps("TEST", 400, 400));
+		//m_Window = new Window(WindowProps(400, 400, "TEST"));
+		m_Window = new Window(WindowProps("TEST"));
 		m_Window->SetEventCallback([this](const Event* e) {
 			//CB_CORE_TRACE(*e);
 			switch (e->Type)
@@ -35,19 +36,6 @@ namespace Cyber {
 				m_Window->onUpdate();
 				break;
 			}
-			/*
-			case EventType::MouseMoved: {
-				const MouseMovedEvent* ev = dynamic_cast<const MouseMovedEvent*>(e);
-				mouseX = ev->x;
-				mouseY = ev->y;
-				break;
-			}
-			case EventType::MouseButtonPressed:
-				mousePressed = true;
-				break;
-			case EventType::MouseButtonReleased:
-				mousePressed = false;
-				break;*/
 			default:
 				break;
 			}
@@ -67,7 +55,7 @@ namespace Cyber {
 	void Application::Run() {
 		CB_CORE_TRACE("RUN");
 		while (m_Runnig) {
-			CB_CORE_TRACE("Time since start: {0}s",glfwGetTime());
+			CB_CORE_TRACE("Time since start: {0}s", glfwGetTime());
 			glClearColor(0, 0, 0, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 			/*if (mousePressed)
