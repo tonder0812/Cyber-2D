@@ -19,6 +19,7 @@ private:
 	Cyber::VertexBuffer* m_VertexBuff = nullptr;
 	Cyber::IndexBuffer* m_IndexBuff = nullptr;
 	Cyber::Shader* m_Shader = nullptr;
+	bool m_useColor = false;
 
 	glm::vec3 cameraPos = { 0,0,0 };
 	float cameraSpeed = 10.0f;

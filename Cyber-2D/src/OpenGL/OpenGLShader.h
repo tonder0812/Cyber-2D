@@ -6,7 +6,8 @@ namespace Cyber {
 	class Shader
 	{
 	public:
-		Shader(const std::string name,const char* vertexSrc,const char* fragmentSrc);
+		Shader(const std::string& name, const std::string vertexSrc, const std::string fragmentSrc);
+		Shader(const std::string& filepath);
 		void Bind();
 		void Unbind();
 
@@ -25,8 +26,9 @@ namespace Cyber {
 		void UploadUniformMat3(const char* name, const glm::mat3& matrix);
 		void UploadUniformMat4(const char* name, const glm::mat4& matrix);
 	private:
-		std::unordered_map<unsigned int, const char*> Preprocess(const char* src);
-		void Compile(std::unordered_map<unsigned int, const char*> srcs);
+		std::unordered_map<unsigned int, std::string> PreProcess(std::string source);
+		void Compile(std::unordered_map<unsigned int, std::string> srcs);
+		std::string ReadFile(const std::string& filepath);
 		std::string m_Name,m_File;
 		uint32_t m_Id;
 	};

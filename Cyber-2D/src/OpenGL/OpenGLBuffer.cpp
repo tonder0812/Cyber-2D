@@ -9,13 +9,13 @@ namespace Cyber {
 	/////////////////////////////////////////////////////////////////////////////
 
 	VertexBuffer::VertexBuffer(void* data, uint32_t size) {
-		glCreateBuffers(1, &m_Id);
+		glGenBuffers(1, &m_Id);
 		glBindBuffer(GL_ARRAY_BUFFER, m_Id);
 		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 	}
 
 	VertexBuffer::VertexBuffer(uint32_t size) {
-		glCreateBuffers(1, &m_Id);
+		glGenBuffers(1, &m_Id);
 		glBindBuffer(GL_ARRAY_BUFFER, m_Id);
 		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 	}
@@ -45,7 +45,7 @@ namespace Cyber {
 
 	IndexBuffer::IndexBuffer(uint32_t* indices, uint32_t count) :
 		m_Count(count) {
-		glCreateBuffers(1, &m_Id);
+		glGenBuffers(1, &m_Id);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Id);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
 	}

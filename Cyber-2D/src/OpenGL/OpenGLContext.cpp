@@ -28,7 +28,9 @@ namespace Cyber {
 		int versionMinor;
 		glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
 		glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
-
+		uint32_t va;
+		glGenVertexArrays(1, &va);
+		glBindVertexArray(va);
 		CB_CORE_WARN("GL Version {0}.{1}", versionMajor, versionMinor);
 	}
 

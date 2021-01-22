@@ -1,13 +1,42 @@
 #include "pch.h"
 #include "OpenGLShader.h"
-#include <glad\glad.h>
+#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <fstream>
 
 namespace Cyber {
-	Shader::Shader(const std::string name, const char* vertexSrc, const char* fragmentSrc) :
+
+	static GLenum ShaderTypeFromString(const std::string& type)
+	{
+		if (type == "vertex")
+			return GL_VERTEX_SHADER;
+		if (type == "fragment" || type == "pixel")
+			return GL_FRAGMENT_SHADER;
+
+		CB_CORE_ASSERT(false, "Unknown shader type!");
+		return 0;
+	}
+
+	Shader::Shader(const std::string& filepath):
+		m_File(filepath)
+	{
+
+		std::string source = ReadFile(filepath);
+		auto shaderSources = PreProcess(source);
+		Compile(shaderSources);
+
+		// Extract name from filepath
+		auto lastSlash = filepath.find_last_of("/\\");
+		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+		auto lastDot = filepath.rfind('.');
+		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
+		m_Name = filepath.substr(lastSlash, count);
+	}
+
+	Shader::Shader(const std::string& name, const std::string vertexSrc, const std::string fragmentSrc) :
 		m_Name(name), m_File("code")
 	{
-		std::unordered_map<unsigned int, const char*> srcs;
+		std::unordered_map<unsigned int, std::string> srcs;
 		srcs[GL_VERTEX_SHADER] = vertexSrc;
 		srcs[GL_FRAGMENT_SHADER] = fragmentSrc;
 		Compile(srcs);
@@ -21,21 +50,70 @@ namespace Cyber {
 		glUseProgram(0);
 	}
 
-	std::unordered_map<unsigned int, const char*> Shader::Preprocess(const char* src) {
-		std::unordered_map<unsigned int, const char*> tmp;
-		return tmp;
+	std::unordered_map<unsigned int, std::string> Shader::PreProcess(std::string source) {
+		std::unordered_map<GLenum, std::string> shaderSources;
+		const char* typeToken = "#type";
+		size_t typeTokenLength = strlen(typeToken);
+
+		size_t pos = source.find(typeToken, 0); //Start of shader type declaration line
+		while (pos != std::string::npos)
+		{
+			size_t eol = source.find_first_of("\r\n", pos); //End of shader type declaration line
+			CB_CORE_ASSERT(eol != std::string::npos, "Syntax error");
+			size_t begin = pos + typeTokenLength + 1; //Start of shader type name (after "#type " keyword)
+			std::string type = source.substr(begin, eol - begin);
+			CB_CORE_ASSERT(ShaderTypeFromString(type), "Invalid shader type specified");
+
+			size_t nextLinePos = source.find_first_not_of("\r\n", eol); //Start of shader code after shader type declaration line
+			CB_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error");
+			pos = source.find(typeToken, nextLinePos); //Start of next shader type declaration line
+
+			shaderSources[ShaderTypeFromString(type)] = ((pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos));
+			//CB_CORE_WARN("{0} {1}",type,shaderSources[ShaderTypeFromString(type)]);
+		}
+
+		return shaderSources;
 	}
 
-	void Shader::Compile(std::unordered_map<unsigned int, const char*> srcs) {
+	std::string Shader::ReadFile(const std::string& filepath)
+	{
+		std::string result;
+		std::ifstream in(filepath, std::ios::in | std::ios::binary); // ifstream closes itself due to RAII
+		if (in)
+		{
+			in.seekg(0, std::ios::end);
+			size_t size = in.tellg();
+			if (size != -1)
+			{
+				result.resize(size);
+				in.seekg(0, std::ios::beg);
+				in.read(&result[0], size);
+			}
+			else
+			{
+				CB_CORE_ERROR("Could not read from file '{0}'", filepath);
+			}
+		}
+		else
+		{
+			CB_CORE_ERROR("Could not open file '{0}'", filepath);
+		}
+		return result;
+	}
+
+	void Shader::Compile(std::unordered_map<unsigned int, std::string> srcs) {
 		GLuint program = glCreateProgram();
+		CB_CORE_ASSERT(srcs.size() <= 2, "We only support 2 shaders for now");
 		std::array<GLenum, 2> glShaderIDs;
 		int glShaderIDIndex = 0;
 		for (auto& kv : srcs)
 		{
 			GLenum type = kv.first;
+			const std::string& source = kv.second;
+
 			GLuint shader = glCreateShader(type);
 
-			const GLchar* sourceCStr = kv.second;
+			const GLchar* sourceCStr = source.c_str();
 			glShaderSource(shader, 1, &sourceCStr, 0);
 
 			glCompileShader(shader);
@@ -53,7 +131,7 @@ namespace Cyber {
 				glDeleteShader(shader);
 
 				CB_CORE_ERROR("{0}", infoLog.data());
-				CB_CORE_ERROR("Shader compilation failure!");
+				CB_CORE_ASSERT(false, "Shader compilation failure!");
 				break;
 			}
 
@@ -85,7 +163,7 @@ namespace Cyber {
 				glDeleteShader(id);
 
 			CB_CORE_ERROR("{0}", infoLog.data());
-			CB_CORE_ERROR("Shader link failure!");
+			CB_CORE_ASSERT(false, "Shader link failure!");
 			return;
 		}
 
@@ -101,12 +179,12 @@ namespace Cyber {
 		GLint location = glGetUniformLocation(m_Id, name);
 		glUniform1i(location, value);
 	}
-	void Shader::UploadUniformIntArray(const char *name, int* values, uint32_t count) {
+	void Shader::UploadUniformIntArray(const char* name, int* values, uint32_t count) {
 		GLint location = glGetUniformLocation(m_Id, name);
 		glUniform1iv(location, count, values);
 	}
 
-	void Shader::UploadUniformFloat(const char *name, float value) {
+	void Shader::UploadUniformFloat(const char* name, float value) {
 		GLint location = glGetUniformLocation(m_Id, name);
 		glUniform1f(location, value);
 	}

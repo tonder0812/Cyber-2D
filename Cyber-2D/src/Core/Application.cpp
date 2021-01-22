@@ -29,11 +29,11 @@ namespace Cyber {
 			case EventType::WindowResize: {
 				const WindowResizeEvent* ev = dynamic_cast<const WindowResizeEvent*>(e);
 				glViewport(0, 0, ev->width, ev->height);
-				m_LayerStack.onUpdate();
+				/*m_LayerStack.onUpdate();
 				m_ImGuiLayer->Begin();
 				m_LayerStack.onImGUI();
 				m_ImGuiLayer->End();
-				m_Window->onUpdate();
+				m_Window->onUpdate();*/
 				break;
 			}
 			default:
