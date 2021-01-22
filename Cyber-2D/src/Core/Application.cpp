@@ -16,8 +16,8 @@ namespace Cyber {
 		}
 		s_Instance = this;
 		m_LayerStack = LayerStack();
-		//m_Window = new Window(WindowProps(400, 400, "TEST"));
-		m_Window = new Window(WindowProps("TEST"));
+		m_Window = new Window(WindowProps(400, 400, "TEST"));
+		//m_Window = new Window(WindowProps("TEST"));
 		m_Window->SetEventCallback([this](const Event* e) {
 			//CB_CORE_TRACE(*e);
 			switch (e->Type)

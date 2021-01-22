@@ -113,17 +113,17 @@ namespace Cyber {
 				{
 				case GLFW_PRESS:
 				{
-					e = new KeyPressedEvent(key,mods, false);
+					e = new KeyPressedEvent(key, mods, false);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					e = new KeyReleasedEvent(key,mods);
+					e = new KeyReleasedEvent(key, mods);
 					break;
 				}
 				case GLFW_REPEAT:
 				{
-					e = new KeyPressedEvent(key,mods, true);
+					e = new KeyPressedEvent(key, mods, true);
 					break;
 				}
 				default: {
