@@ -14,7 +14,7 @@ namespace Cyber {
 		void popLayer(Layer* layer);
 		void pushOverlay(Layer* layer);
 		void popOverlay(Layer* layer);
-		void onUpdate();
+		void onUpdate(float ts);
 		void onEvent(const Event *e);
 		void onImGUI();
 	private:
@@ -28,7 +28,7 @@ namespace Cyber {
 		name(nam){
 		}
 		std::string name;
-		virtual void onUpdate() {};
+		virtual void onUpdate(float ts) {};
 		virtual void onImGUI() {};
 		virtual void onAttach() {};
 		virtual void onDetach() {};

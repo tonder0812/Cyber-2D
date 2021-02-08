@@ -25,6 +25,7 @@ namespace Cyber {
 		bool m_Runnig;
 		bool onWindowClose();
 		ImGUILayer* m_ImGuiLayer;
+		float lastFrameTime = 0;
 	};
 }
 

@@ -25,3 +25,4 @@ void main() {
 		color = v_pos * 0.5 + 0.5;
 	}
 }
+

@@ -17,7 +17,7 @@ void DemoLayer::onAttach() {
 		-190.0f ,  190.0f , 0
 	};*/
 	float vert[] = {
-		-width/2.0f , -height/2.0f , 0,
+		-width / 2.0f , -height / 2.0f , 0,
 		 width / 2.0f , -height / 2.0f , 0,
 		 width / 2.0f ,  height / 2.0f , 0,
 		-width / 2.0f ,  height / 2.0f , 0
@@ -45,7 +45,7 @@ void DemoLayer::onImGUI() {
 	ImGui::Checkbox("Use Color", &m_useColor);
 	//ImGui::ShowDemoWindow();
 }
-void DemoLayer::onUpdate() {
+void DemoLayer::onUpdate(float ts) {
 	uint32_t width = Cyber::Application::Get().GetWindow()->GetWidth();
 	uint32_t height = Cyber::Application::Get().GetWindow()->GetHeight();
 	float vert[] = {
@@ -56,18 +56,18 @@ void DemoLayer::onUpdate() {
 	};
 	m_VertexBuff->SetData(vert, sizeof(vert));
 	if (Cyber::Input::IsKeyPressed(CB_KEY_UP))
-		cameraPos.y -= cameraSpeed;
+		cameraPos.y -= cameraSpeed * ts;
 	if (Cyber::Input::IsKeyPressed(CB_KEY_DOWN))
-		cameraPos.y += cameraSpeed;
+		cameraPos.y += cameraSpeed * ts;
 	if (Cyber::Input::IsKeyPressed(CB_KEY_RIGHT))
-		cameraPos.x -= cameraSpeed;
+		cameraPos.x -= cameraSpeed * ts;
 	if (Cyber::Input::IsKeyPressed(CB_KEY_LEFT))
-		cameraPos.x += cameraSpeed;
-	
+		cameraPos.x += cameraSpeed * ts;
+
 	m_Camera = glm::translate(glm::ortho(-(width / 2.0f), width / 2.0f, -(height / 2.0f), height / 2.0f, -1.0f, 1.0f), cameraPos);
 	m_Shader->Bind();
 	m_Shader->UploadUniformFloat3("u_color", m_Color);
-	m_Shader->UploadUniformInt("u_useColor", m_useColor?1:0);
+	m_Shader->UploadUniformInt("u_useColor", m_useColor ? 1 : 0);
 	m_Shader->UploadUniformMat4("u_camera", m_Camera);
 	m_VertexBuff->Bind(true);
 	m_IndexBuff->Bind();

@@ -11,7 +11,7 @@ public:
 	void onAttach() override;
 	void onDetach() override;
 	void onImGUI() override;
-	void onUpdate() override;
+	void onUpdate(float ts) override;
 	bool onEvent(const Cyber::Event* e) override;
 private:
 	glm::vec3 m_Color = { 1.0f,0,0 };
@@ -22,5 +22,5 @@ private:
 	bool m_useColor = false;
 
 	glm::vec3 cameraPos = { 0,0,0 };
-	float cameraSpeed = 10.0f;
+	float cameraSpeed = 500.0f;
 };

@@ -57,7 +57,7 @@ namespace Cyber {
 		}
 	}
 
-	void LayerStack::onUpdate() {
+	void LayerStack::onUpdate(float ts) {
 		int i = 0;
 		for (auto it = m_Stack.rbegin(); it != m_Stack.rend(); ++it)
 		{
@@ -65,7 +65,7 @@ namespace Cyber {
 			CB_CORE_INFO("Update {0}:{1}", *(*it), i);
 			i++;
 			#endif
-			(*it)->onUpdate();
+			(*it)->onUpdate(ts);
 		}
 		for (auto it = m_Overlays.rbegin(); it != m_Overlays.rend(); ++it)
 		{
@@ -73,7 +73,7 @@ namespace Cyber {
 			CB_CORE_INFO("Update {0}:{1}", *(*it), i);
 			i++;
 			#endif
-			(*it)->onUpdate();
+			(*it)->onUpdate(ts);
 		}
 	}
 

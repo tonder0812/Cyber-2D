@@ -55,17 +55,13 @@ namespace Cyber {
 	void Application::Run() {
 		CB_CORE_TRACE("RUN");
 		while (m_Runnig) {
-			CB_CORE_TRACE("Time since start: {0}s", glfwGetTime());
+			float now = glfwGetTime();
+			float ts = now - lastFrameTime;
+			lastFrameTime = now;
+			CB_CORE_TRACE("Frame rate: {0:.2f}fps", 1/ts);
 			glClearColor(0, 0, 0, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
-			/*if (mousePressed)
-			{
-				glClearColor(mouseX / m_Window->GetWidth(), mouseY / m_Window->GetHeight(), 1, 1);
-			}
-			else
-				glClearColor(mouseX / m_Window->GetWidth(), mouseY / m_Window->GetHeight(), 0, 1);
-			glClear(GL_COLOR_BUFFER_BIT);*/
-			m_LayerStack.onUpdate();
+			m_LayerStack.onUpdate(ts);
 			m_ImGuiLayer->Begin();
 			m_LayerStack.onImGUI();
 			m_ImGuiLayer->End();
