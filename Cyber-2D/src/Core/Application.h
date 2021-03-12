@@ -21,7 +21,7 @@ namespace Cyber {
 	private:
 		static Application* s_Instance;
 		Window* m_Window;
-		LayerStack m_LayerStack;
+		LayerStack* m_LayerStack;
 		bool m_Runnig;
 		bool onWindowClose();
 		ImGUILayer* m_ImGuiLayer;

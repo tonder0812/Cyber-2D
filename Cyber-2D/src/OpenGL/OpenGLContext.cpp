@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Core/Log.h"
 #include "OpenGLContext.h"
+#include "OpenGLErrorCallback.h"
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
@@ -8,8 +9,7 @@ namespace Cyber {
 	OpenGLContext::OpenGLContext(GLFWwindow* windowHandle)
 		: m_WindowHandle(windowHandle)
 	{
-		if (!windowHandle)
-			CB_CORE_ERROR("Window handle is null!");
+		CB_CORE_ASSERT(windowHandle,"Window handle is null!");
 	}
 
 	void OpenGLContext::Init()
@@ -29,8 +29,8 @@ namespace Cyber {
 		glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
 		glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
 		uint32_t va;
-		glGenVertexArrays(1, &va);
-		glBindVertexArray(va);
+		GL_CHECK(glGenVertexArrays(1, &va));
+		GL_CHECK(glBindVertexArray(va));
 		CB_CORE_WARN("GL Version {0}.{1}", versionMajor, versionMinor);
 	}
 

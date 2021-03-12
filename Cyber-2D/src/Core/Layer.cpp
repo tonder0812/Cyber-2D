@@ -30,8 +30,8 @@ namespace Cyber {
 		auto it = std::find(m_Stack.begin() , m_Stack.end(), layer);
 		if (it!=m_Stack.end())
 		{
-			CB_CORE_WARN("LAYER {0} POPPED",*layer);
 			layer->onDetach();
+			CB_CORE_WARN("LAYER {0} POPPED",*layer);
 			m_Stack.erase(it);
 			CB_CORE_WARN("LAYER {0} DELETED", *layer);
 			delete layer;

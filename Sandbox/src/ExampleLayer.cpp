@@ -1,21 +1,15 @@
 #include "pch.h"
 #include "Cyber.h"
 #include <imgui.h>
-#include "ExampleLayer.h"
-#include "Core/Application.h"
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "ExampleLayer.h"
+#include "Core/Application.h"
+#include "OpenGL/OpenGLRenderer.h"
 
 void DemoLayer::onAttach() {
 	int width = Cyber::Application::Get().GetWindow()->GetWidth();
 	int height = Cyber::Application::Get().GetWindow()->GetHeight();
-	/*float vert[] = {
-		-190.0f , -190.0f , 0,
-		 190.0f , -190.0f , 0,
-		 190.0f ,  190.0f , 0,
-		-190.0f ,  190.0f , 0
-	};*/
 	float vert[] = {
 		-width / 2.0f , -height / 2.0f , 0,
 		 width / 2.0f , -height / 2.0f , 0,
@@ -46,6 +40,8 @@ void DemoLayer::onImGUI() {
 	//ImGui::ShowDemoWindow();
 }
 void DemoLayer::onUpdate(float ts) {
+	Cyber::Renderer::SetClearColor({ 0.1,0.1,0.1,1 });
+	Cyber::Renderer::Clear();
 	uint32_t width = Cyber::Application::Get().GetWindow()->GetWidth();
 	uint32_t height = Cyber::Application::Get().GetWindow()->GetHeight();
 	float vert[] = {
@@ -69,9 +65,7 @@ void DemoLayer::onUpdate(float ts) {
 	m_Shader->UploadUniformFloat3("u_color", m_Color);
 	m_Shader->UploadUniformInt("u_useColor", m_useColor ? 1 : 0);
 	m_Shader->UploadUniformMat4("u_camera", m_Camera);
-	m_VertexBuff->Bind(true);
-	m_IndexBuff->Bind();
-	glDrawElements(GL_TRIANGLES, m_IndexBuff->GetCount(), GL_UNSIGNED_INT, nullptr);
+	Cyber::Renderer::DrawIndexed(m_VertexBuff, m_IndexBuff);
 }
 
 bool DemoLayer::onEvent(const Cyber::Event* e) {

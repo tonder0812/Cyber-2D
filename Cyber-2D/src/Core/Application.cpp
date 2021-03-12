@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Application.h"
 #include "Window.h"
-#include "GLFW\glfw3.h"
-#include "glad\glad.h"
+#include "GLFW/glfw3.h"
+#include "OpenGL/OpenGLRenderer.h"
 #include "ImGUILayer.h"
 
 namespace Cyber {
@@ -15,7 +15,7 @@ namespace Cyber {
 			CB_CORE_CRITICAL("Aplication Already Open");
 		}
 		s_Instance = this;
-		m_LayerStack = LayerStack();
+		m_LayerStack = new LayerStack();
 		m_Window = new Window(WindowProps(400, 400, "TEST"));
 		//m_Window = new Window(WindowProps("TEST"));
 		m_Window->SetEventCallback([this](const Event* e) {
@@ -28,7 +28,7 @@ namespace Cyber {
 			}
 			case EventType::WindowResize: {
 				const WindowResizeEvent* ev = dynamic_cast<const WindowResizeEvent*>(e);
-				glViewport(0, 0, ev->width, ev->height);
+				Renderer::SetViewport(ev->width, ev->height);
 				/*m_LayerStack.onUpdate();
 				m_ImGuiLayer->Begin();
 				m_LayerStack.onImGUI();
@@ -39,16 +39,17 @@ namespace Cyber {
 			default:
 				break;
 			}
-			m_LayerStack.onEvent(e);
+			m_LayerStack->onEvent(e);
 			delete e;
 			});
 		m_ImGuiLayer = new ImGUILayer();
-		m_LayerStack.pushOverlay(m_ImGuiLayer);
+		m_LayerStack->pushOverlay(m_ImGuiLayer);
 		m_Runnig = true;
 
 	}
 	Application::~Application() {
-		m_LayerStack.popOverlay(m_ImGuiLayer);
+		m_LayerStack->popOverlay(m_ImGuiLayer);
+		delete m_LayerStack;
 		delete m_Window;
 	}
 
@@ -58,12 +59,10 @@ namespace Cyber {
 			float now = glfwGetTime();
 			float ts = now - lastFrameTime;
 			lastFrameTime = now;
-			CB_CORE_TRACE("Frame rate: {0:.2f}fps", 1/ts);
-			glClearColor(0, 0, 0, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
-			m_LayerStack.onUpdate(ts);
+			CB_CORE_TRACE("Frame rate: {0:.2f}fps", 1 / ts);
+			m_LayerStack->onUpdate(ts);
 			m_ImGuiLayer->Begin();
-			m_LayerStack.onImGUI();
+			m_LayerStack->onImGUI();
 			m_ImGuiLayer->End();
 
 			m_Window->onUpdate();
@@ -77,9 +76,9 @@ namespace Cyber {
 	}
 
 	void Application::pushLayer(Layer* layer) {
-		m_LayerStack.pushLayer(layer);
+		m_LayerStack->pushLayer(layer);
 	}
 	void Application::popLayer(Layer* layer) {
-		m_LayerStack.popLayer(layer);
+		m_LayerStack->popLayer(layer);
 	}
 }
