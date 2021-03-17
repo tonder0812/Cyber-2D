@@ -18,7 +18,7 @@ namespace Cyber {
 	}
 	void Renderer::DrawIndexed(VertexBuffer* vb, IndexBuffer* ib)
 	{
-		vb->Bind();
+		vb->Bind(true);
 		ib->Bind();
 		uint32_t count = ib->GetCount();
 		GL_CHECK(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr));

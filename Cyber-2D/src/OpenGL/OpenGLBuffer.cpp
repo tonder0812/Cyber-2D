@@ -88,7 +88,7 @@ namespace Cyber {
 		void *offset = 0;
 		for (BufferElement e : m_Elements) {
 			GL_CHECK(glEnableVertexAttribArray(i));
-			GL_CHECK(glVertexAttribPointer(i, e.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(e.Type), e.Normalized ? GL_TRUE : GL_FALSE, e.Size, (const void*)offset));
+			GL_CHECK(glVertexAttribPointer(i, e.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(e.Type), e.Normalized ? GL_TRUE : GL_FALSE, m_Stride, (const void*)e.Offset));
 			i++;
 		}
 	}

@@ -2,6 +2,7 @@
 #include <glm\glm.hpp>
 #include "OpenGL\OpenGLBuffer.h"
 #include "OpenGL\OpenGLShader.h"
+#include "OpenGL\OpenGLTexture.h"
 
 class DemoLayer : public Cyber::Layer {
 public:
@@ -19,8 +20,10 @@ private:
 	Cyber::VertexBuffer* m_VertexBuff = nullptr;
 	Cyber::IndexBuffer* m_IndexBuff = nullptr;
 	Cyber::Shader* m_Shader = nullptr;
+	Cyber::Texture* m_Texture = nullptr;
 	bool m_useColor = false;
-
+	float scale = 1;
+	char m_TextureLocation[255]="assets/textures/cic.png";
 	glm::vec3 cameraPos = { 0,0,0 };
 	float cameraSpeed = 500.0f;
 };

@@ -59,7 +59,7 @@ namespace Cyber {
 			float now = glfwGetTime();
 			float ts = now - lastFrameTime;
 			lastFrameTime = now;
-			CB_CORE_TRACE("Frame rate: {0:.2f}fps", 1 / ts);
+			//CB_CORE_TRACE("Frame rate: {0:.2f}fps", 1 / ts);
 			m_LayerStack->onUpdate(ts);
 			m_ImGuiLayer->Begin();
 			m_LayerStack->onImGUI();
