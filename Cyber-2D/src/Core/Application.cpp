@@ -16,8 +16,8 @@ namespace Cyber {
 		}
 		s_Instance = this;
 		m_LayerStack = new LayerStack();
-		m_Window = new Window(WindowProps(400, 400, "TEST"));
-		//m_Window = new Window(WindowProps("TEST"));
+		m_Window = new Window(WindowProps(1900, 980, "TEST", true, m_Minimized));
+		//m_Window = new Window(WindowProps("TEST",m_Minimized));
 		m_Window->SetEventCallback([this](const Event* e) {
 			//CB_CORE_TRACE(*e);
 			switch (e->Type)
@@ -28,6 +28,12 @@ namespace Cyber {
 			}
 			case EventType::WindowResize: {
 				const WindowResizeEvent* ev = dynamic_cast<const WindowResizeEvent*>(e);
+				if (ev->width == 0 || ev->height == 0)
+				{
+					m_Minimized = true;
+					break;
+				}
+				m_Minimized = false;
 				Renderer::SetViewport(ev->width, ev->height);
 				/*m_LayerStack.onUpdate();
 				m_ImGuiLayer->Begin();
@@ -45,7 +51,6 @@ namespace Cyber {
 		m_ImGuiLayer = new ImGUILayer();
 		m_LayerStack->pushOverlay(m_ImGuiLayer);
 		m_Runnig = true;
-
 	}
 	Application::~Application() {
 		m_LayerStack->popOverlay(m_ImGuiLayer);
@@ -56,9 +61,10 @@ namespace Cyber {
 	void Application::Run() {
 		CB_CORE_TRACE("RUN");
 		while (m_Runnig) {
-			float now = glfwGetTime();
+			float now = (float)glfwGetTime();
 			float ts = now - lastFrameTime;
 			lastFrameTime = now;
+			CB_CORE_TRACE(m_Minimized);
 			//CB_CORE_TRACE("Frame rate: {0:.2f}fps", 1 / ts);
 			m_LayerStack->onUpdate(ts);
 			m_ImGuiLayer->Begin();

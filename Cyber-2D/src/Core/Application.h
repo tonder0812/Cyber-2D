@@ -23,6 +23,7 @@ namespace Cyber {
 		Window* m_Window;
 		LayerStack* m_LayerStack;
 		bool m_Runnig;
+		bool m_Minimized = false;
 		bool onWindowClose();
 		ImGUILayer* m_ImGuiLayer;
 		float lastFrameTime = 0;

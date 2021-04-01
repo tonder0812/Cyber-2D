@@ -22,7 +22,10 @@ private:
 	Cyber::Shader* m_Shader = nullptr;
 	Cyber::Texture* m_Texture = nullptr;
 	bool m_useColor = false;
+	bool m_useImage = false;
+	bool m_ignoreNext = false;
 	float scale = 1;
+	float rotation = 0;
 	char m_TextureLocation[255]="assets/textures/cic.png";
 	glm::vec3 cameraPos = { 0,0,0 };
 	float cameraSpeed = 500.0f;

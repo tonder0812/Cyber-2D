@@ -62,11 +62,16 @@ void DemoLayer::onDetach() {
 }
 
 void DemoLayer::onImGUI() {
-	/*
 	ImGui::ColorEdit3("Rectangle Color", glm::value_ptr(m_Color));
-	ImGui::Checkbox("Use Color", &m_useColor);
-	*/
-	ImGui::InputText("Texture location", m_TextureLocation, sizeof(m_TextureLocation));
+	if (ImGui::Checkbox("Use Color", &m_useColor) && m_useColor) {
+		m_useImage = false;
+	}
+	if (ImGui::Checkbox("Use Image", &m_useImage) && m_useImage) {
+		m_useColor = false;
+	}
+	if (ImGui::InputText("Texture location", m_TextureLocation, sizeof(m_TextureLocation))) {
+		m_ignoreNext = true;
+	}
 	if (ImGui::Button("Update")) {
 		delete m_Texture;
 		m_Texture = new Cyber::Texture(m_TextureLocation);
@@ -108,11 +113,16 @@ void DemoLayer::onUpdate(float ts) {
 		cameraPos.x -= cameraSpeed * ts;
 	if (Cyber::Input::IsKeyPressed(CB_KEY_LEFT))
 		cameraPos.x += cameraSpeed * ts;
+	if (Cyber::Input::IsKeyPressed(CB_KEY_A))
+		rotation += 0.2 * ts;
+	if (Cyber::Input::IsKeyPressed(CB_KEY_D))
+		rotation -= 0.2 * ts;
 
-	m_Camera = glm::translate(glm::ortho(-(width / 2.0f) / scale, width / 2.0f / scale, -(height / 2.0f) / scale, height / 2.0f / scale, -1.0f, 1.0f), cameraPos);
-	
-	//m_Shader->UploadUniformFloat3("u_color", m_Color);
-	//m_Shader->UploadUniformInt("u_useColor", m_useColor ? 1 : 0);
+	m_Camera = glm::translate(glm::rotate(glm::ortho(-(width / 2.0f) / scale, width / 2.0f / scale, -(height / 2.0f) / scale, height / 2.0f / scale, -1.0f, 1.0f), rotation, { 0,0,1 }), cameraPos);
+
+	m_Shader->UploadUniformFloat3("u_color", m_Color);
+	m_Shader->UploadUniformInt("u_useColor", m_useColor ? 1 : 0);
+	m_Shader->UploadUniformInt("u_useImage", m_useImage ? 1 : 0);
 	m_Texture->Bind();
 	m_Shader->Bind();
 	m_Shader->UploadUniformMat4("u_camera", m_Camera);
@@ -123,6 +133,10 @@ bool DemoLayer::onEvent(const Cyber::Event* e) {
 	if (e->Type == Cyber::EventType::KeyPressed)
 	{
 		Cyber::KeyPressedEvent* ev = (Cyber::KeyPressedEvent*)e;
+		if (m_ignoreNext) {
+			m_ignoreNext = false;
+			return true;
+		}
 		switch (ev->key)
 		{
 		case CB_KEY_ESCAPE:
@@ -140,6 +154,7 @@ bool DemoLayer::onEvent(const Cyber::Event* e) {
 		case CB_KEY_R:
 			cameraPos = { 0,0,0 };
 			scale = 1;
+			rotation = 0;
 			break;
 		default:
 			break;
@@ -151,7 +166,7 @@ bool DemoLayer::onEvent(const Cyber::Event* e) {
 		scale += ev->yoff * 0.1;
 		if (scale < 0.1)
 		{
-			scale=0.1;
+			scale = 0.1;
 		}
 	}
 	return false;
