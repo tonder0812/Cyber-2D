@@ -8,12 +8,7 @@ namespace Cyber {
 	Texture::Texture(uint32_t width, uint32_t height, GLenum internalFormat, GLenum dataFormat)
 		: m_Width(width), m_Height(height), m_InternalFormat(internalFormat), m_DataFormat(dataFormat)
 	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		glEnable(GL_DEPTH_TEST);
 		GL_CHECK(glGenTextures(1, &m_ID));
-
 		GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_ID));
 
 		GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 1, m_InternalFormat, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_INT, NULL));
@@ -27,10 +22,6 @@ namespace Cyber {
 
 	Texture::Texture(const std::string& path)
 	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		glEnable(GL_DEPTH_TEST);
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
 		stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);

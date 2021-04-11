@@ -48,12 +48,14 @@ namespace Cyber {
 			m_LayerStack->onEvent(e);
 			delete e;
 			});
+		Renderer::Init();
 		m_ImGuiLayer = new ImGUILayer();
 		m_LayerStack->pushOverlay(m_ImGuiLayer);
 		m_Runnig = true;
 	}
 	Application::~Application() {
 		m_LayerStack->popOverlay(m_ImGuiLayer);
+		Renderer::Shutdown();
 		delete m_LayerStack;
 		delete m_Window;
 	}
@@ -64,7 +66,6 @@ namespace Cyber {
 			float now = (float)glfwGetTime();
 			float ts = now - lastFrameTime;
 			lastFrameTime = now;
-			CB_CORE_TRACE(m_Minimized);
 			//CB_CORE_TRACE("Frame rate: {0:.2f}fps", 1 / ts);
 			m_LayerStack->onUpdate(ts);
 			m_ImGuiLayer->Begin();
