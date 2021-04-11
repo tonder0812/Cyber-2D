@@ -21,6 +21,7 @@ void DemoLayer::onAttach() {
 	}
 	m_Texture->SetData(data, sizeof(data));
 	*/
+
 	m_Texture = new Cyber::Texture("assets/textures/cic.png");
 	int width = Cyber::Application::Get().GetWindow()->GetWidth();
 	int height = Cyber::Application::Get().GetWindow()->GetHeight();
@@ -52,6 +53,7 @@ void DemoLayer::onAttach() {
 	m_Shader->Bind();
 	m_Shader->UploadUniformInt("u_sampler", 0);
 	m_Shader->UploadUniformInt("u_channels", m_Texture->GetChannels());
+	m_Camera = Cyber::OrthographicCamera(-(width / 2.0f) / scale, width / 2.0f / scale, -(height / 2.0f) / scale, height / 2.0f / scale);
 }
 
 void DemoLayer::onDetach() {
@@ -114,23 +116,24 @@ void DemoLayer::onUpdate(float ts) {
 	if (Cyber::Input::IsKeyPressed(CB_KEY_LEFT))
 		cameraPos.x += cameraSpeed * ts;
 	if (Cyber::Input::IsKeyPressed(CB_KEY_A))
-		rotation += 0.2 * ts;
+		m_Camera.SetRotation(m_Camera.GetRotation() + 0.2 * ts);
 	if (Cyber::Input::IsKeyPressed(CB_KEY_D))
-		rotation -= 0.2 * ts;
+		m_Camera.SetRotation(m_Camera.GetRotation() - 0.2 * ts);
 
-	m_Camera = glm::translate(glm::rotate(glm::ortho(-(width / 2.0f) / scale, width / 2.0f / scale, -(height / 2.0f) / scale, height / 2.0f / scale, -1.0f, 1.0f), rotation, { 0,0,1 }), cameraPos);
-
+	m_Camera.SetPosition(cameraPos);
 	m_Shader->UploadUniformFloat3("u_color", m_Color);
 	m_Shader->UploadUniformInt("u_useColor", m_useColor ? 1 : 0);
 	m_Shader->UploadUniformInt("u_useImage", m_useImage ? 1 : 0);
 	m_Texture->Bind();
 	m_Shader->Bind();
-	m_Shader->UploadUniformMat4("u_camera", m_Camera);
+	m_Shader->UploadUniformMat4("u_camera", m_Camera.GetViewProjectionMatrix());
 	Cyber::Renderer::DrawIndexed(m_VertexBuff, m_IndexBuff);
 }
 
 bool DemoLayer::onEvent(const Cyber::Event* e) {
-	if (e->Type == Cyber::EventType::KeyPressed)
+	switch (e->Type)
+	{
+	case Cyber::EventType::KeyPressed:
 	{
 		Cyber::KeyPressedEvent* ev = (Cyber::KeyPressedEvent*)e;
 		if (m_ignoreNext) {
@@ -154,13 +157,14 @@ bool DemoLayer::onEvent(const Cyber::Event* e) {
 		case CB_KEY_R:
 			cameraPos = { 0,0,0 };
 			scale = 1;
-			rotation = 0;
+			m_Camera.SetRotation(0);
 			break;
 		default:
 			break;
 		}
+		break;
 	}
-	else if (e->Type == Cyber::EventType::MouseScrolled)
+	case Cyber::EventType::MouseScrolled:
 	{
 		Cyber::MouseScrolledEvent* ev = (Cyber::MouseScrolledEvent*)e;
 		scale += ev->yoff * 0.1;
@@ -168,6 +172,18 @@ bool DemoLayer::onEvent(const Cyber::Event* e) {
 		{
 			scale = 0.1;
 		}
+		int width = Cyber::Application::Get().GetWindow()->GetWidth();
+		int height = Cyber::Application::Get().GetWindow()->GetHeight();
+		m_Camera.SetProjection(-(width / 2.0f) / scale, width / 2.0f / scale, -(height / 2.0f) / scale, height / 2.0f / scale);
+		break;
+	}
+	case Cyber::EventType::WindowResize:
+	{
+		int width = Cyber::Application::Get().GetWindow()->GetWidth();
+		int height = Cyber::Application::Get().GetWindow()->GetHeight();
+		m_Camera.SetProjection(-(width / 2.0f) / scale, width / 2.0f / scale, -(height / 2.0f) / scale, height / 2.0f / scale);
+		break;
+	}
 	}
 	return false;
 }

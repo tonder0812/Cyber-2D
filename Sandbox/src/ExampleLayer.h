@@ -3,11 +3,12 @@
 #include "OpenGL\OpenGLBuffer.h"
 #include "OpenGL\OpenGLShader.h"
 #include "OpenGL\OpenGLTexture.h"
+#include "Renderer\OrthographicCamera.h"
 
 class DemoLayer : public Cyber::Layer {
 public:
 	DemoLayer() :
-		Layer("Example Layer"), m_VertexBuff(nullptr), m_IndexBuff(nullptr), m_Shader(nullptr) {
+		Layer("Example Layer"), m_VertexBuff(nullptr), m_IndexBuff(nullptr), m_Shader(nullptr),m_Camera(-1,1,-1,1) {
 	};
 	void onAttach() override;
 	void onDetach() override;
@@ -16,7 +17,7 @@ public:
 	bool onEvent(const Cyber::Event* e) override;
 private:
 	glm::vec3 m_Color = { 1.0f,0,0 };
-	glm::mat4 m_Camera = glm::mat4(1);
+	Cyber::OrthographicCamera m_Camera;
 	Cyber::VertexBuffer* m_VertexBuff = nullptr;
 	Cyber::IndexBuffer* m_IndexBuff = nullptr;
 	Cyber::Shader* m_Shader = nullptr;
@@ -25,7 +26,6 @@ private:
 	bool m_useImage = false;
 	bool m_ignoreNext = false;
 	float scale = 1;
-	float rotation = 0;
 	char m_TextureLocation[255]="assets/textures/cic.png";
 	glm::vec3 cameraPos = { 0,0,0 };
 	float cameraSpeed = 500.0f;
