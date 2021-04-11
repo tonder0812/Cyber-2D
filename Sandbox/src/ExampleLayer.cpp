@@ -9,125 +9,67 @@
 #include "OpenGL/OpenGLTexture.h"
 
 void DemoLayer::onAttach() {
-	/*m_Texture = new Cyber::Texture(19, 19);
-	glm::u8vec4 data[19 * 19];
-	for (size_t x = 0; x < 19; x++)
-	{
-		for (size_t y = 0; y < 19; y++)
-		{
-			int v = ((x * 19 + y) % 2 == 0) ? 255 : 0;
-			data[x * 19 + y] = glm::u8vec4(v, v, v, 255);
-		}
-	}
-	m_Texture->SetData(data, sizeof(data));
-	*/
 
-	m_Texture = new Cyber::Texture("assets/textures/cic.png");
+	m_Texture = new Cyber::Texture(m_TextureLocation);
 	int width = Cyber::Application::Get().GetWindow()->GetWidth();
 	int height = Cyber::Application::Get().GetWindow()->GetHeight();
-	/*float vert[] = {
-		-width / 2.0f , -height / 2.0f , 0,  0 , 0,
-		 width / 2.0f , -height / 2.0f , 0,  1 , 0,
-		 width / 2.0f ,  height / 2.0f , 0,  1 , 1,
-		-width / 2.0f ,  height / 2.0f , 0,  0 , 1
-	};*/
 	CB_CORE_INFO("{0}:{1}", m_Texture->GetWidth(), m_Texture->GetHeight());
-	float vert[] = {
-		-(m_Texture->GetWidth() / 2.0f) , -(m_Texture->GetHeight() / 2.0f) , 0,  0 , 0,
-		 (m_Texture->GetWidth() / 2.0f) , -(m_Texture->GetHeight() / 2.0f) , 0,  1 , 0,
-		 (m_Texture->GetWidth() / 2.0f) ,  (m_Texture->GetHeight() / 2.0f) , 0,  1 , 1,
-		-(m_Texture->GetWidth() / 2.0f) ,  (m_Texture->GetHeight() / 2.0f) , 0,  0 , 1
-	};
-	m_VertexBuff = new Cyber::VertexBuffer(vert, sizeof(vert));
 
-	Cyber::BufferLayout Layout = {
-		{Cyber::ShaderDataType::Float3,"a_Position"},
-		{Cyber::ShaderDataType::Float2,"a_TexCoord"}
-	};
-	Layout.Bind();
-	m_VertexBuff->SetLayout(Layout);
-	uint32_t indices[] = { 0,1,2,2,3,0 };
-	m_IndexBuff = new Cyber::IndexBuffer(indices, sizeof(indices) / sizeof(uint32_t));
 	m_Texture->Bind();
-	m_Shader = new Cyber::Shader("assets/shaders/example.shader");
-	m_Shader->Bind();
-	m_Shader->UploadUniformInt("u_sampler", 0);
-	m_Shader->UploadUniformInt("u_channels", m_Texture->GetChannels());
 	m_Camera = Cyber::OrthographicCamera(-(width / 2.0f) / scale, width / 2.0f / scale, -(height / 2.0f) / scale, height / 2.0f / scale);
 }
 
 void DemoLayer::onDetach() {
-	delete m_VertexBuff;
-	delete m_IndexBuff;
-	delete m_Shader;
 	delete m_Texture;
 }
 
 void DemoLayer::onImGUI() {
-	ImGui::ColorEdit3("Rectangle Color", glm::value_ptr(m_Color));
+	ImGui::ColorEdit4("Rectangle Color", glm::value_ptr(m_Color));
 	if (ImGui::Checkbox("Use Color", &m_useColor) && m_useColor) {
-		m_useImage = false;
+		m_useTint = false;
 	}
-	if (ImGui::Checkbox("Use Image", &m_useImage) && m_useImage) {
+	if (ImGui::Checkbox("Use Tint", &m_useTint) && m_useTint) {
 		m_useColor = false;
 	}
-	if (ImGui::InputText("Texture location", m_TextureLocation, sizeof(m_TextureLocation))) {
-		m_ignoreNext = true;
-	}
+	ImGui::InputText("Texture location", m_TextureLocation, sizeof(m_TextureLocation));
 	if (ImGui::Button("Update")) {
 		delete m_Texture;
 		m_Texture = new Cyber::Texture(m_TextureLocation);
-		int width = Cyber::Application::Get().GetWindow()->GetWidth();
-		int height = Cyber::Application::Get().GetWindow()->GetHeight();
-		CB_CORE_INFO("{0}:{1}", m_Texture->GetWidth(), m_Texture->GetHeight());
-		float vert[] = {
-			-(m_Texture->GetWidth() / 2.0f) , -(m_Texture->GetHeight() / 2.0f) , 0,  0 , 0,
-			 (m_Texture->GetWidth() / 2.0f) , -(m_Texture->GetHeight() / 2.0f) , 0,  1 , 0,
-			 (m_Texture->GetWidth() / 2.0f) ,  (m_Texture->GetHeight() / 2.0f) , 0,  1 , 1,
-			-(m_Texture->GetWidth() / 2.0f) ,  (m_Texture->GetHeight() / 2.0f) , 0,  0 , 1
-		};
-		m_VertexBuff->SetData(vert, sizeof(vert));
-		m_Texture->Bind();
-		m_Shader->Bind();
-		m_Shader->UploadUniformInt("u_channels", m_Texture->GetChannels());
-
 	}
-	//ImGui::ShowDemoWindow();
 }
 void DemoLayer::onUpdate(float ts) {
-	CB_CORE_TRACE(scale);
 	Cyber::Renderer::SetClearColor({ 0.1,0.1,0.1,1 });
 	Cyber::Renderer::Clear();
 	uint32_t width = Cyber::Application::Get().GetWindow()->GetWidth();
 	uint32_t height = Cyber::Application::Get().GetWindow()->GetHeight();
-	/*float vert[] = {
-		-width / 2.0f , -height / 2.0f , 0,  0 , 0,
-		 width / 2.0f , -height / 2.0f , 0,  1 , 0,
-		 width / 2.0f ,  height / 2.0f , 0,  1 , 1,
-		-width / 2.0f ,  height / 2.0f , 0,  0 , 1
-	};
-	m_VertexBuff->SetData(vert, sizeof(vert));*/
-	if (Cyber::Input::IsKeyPressed(CB_KEY_UP))
-		cameraPos.y -= cameraSpeed * ts;
-	if (Cyber::Input::IsKeyPressed(CB_KEY_DOWN))
-		cameraPos.y += cameraSpeed * ts;
-	if (Cyber::Input::IsKeyPressed(CB_KEY_RIGHT))
-		cameraPos.x -= cameraSpeed * ts;
-	if (Cyber::Input::IsKeyPressed(CB_KEY_LEFT))
-		cameraPos.x += cameraSpeed * ts;
-	if (Cyber::Input::IsKeyPressed(CB_KEY_A))
-		m_Camera.SetRotation(m_Camera.GetRotation() + 0.2 * ts);
-	if (Cyber::Input::IsKeyPressed(CB_KEY_D))
-		m_Camera.SetRotation(m_Camera.GetRotation() - 0.2 * ts);
-
-	m_Camera.SetPosition(cameraPos);
-	m_Shader->UploadUniformFloat3("u_color", m_Color);
-	m_Shader->UploadUniformInt("u_useColor", m_useColor ? 1 : 0);
-	m_Shader->UploadUniformInt("u_useImage", m_useImage ? 1 : 0);
-	m_Texture->Bind();
-	m_Shader->Bind();
-	m_Shader->UploadUniformMat4("u_camera", m_Camera.GetViewProjectionMatrix());
-	Cyber::Renderer::DrawIndexed(m_VertexBuff, m_IndexBuff);
+	if (!ImGui::GetIO().WantCaptureKeyboard) {
+		if (Cyber::Input::IsKeyPressed(CB_KEY_UP))
+			cameraPos.y -= cameraSpeed * ts;
+		if (Cyber::Input::IsKeyPressed(CB_KEY_DOWN))
+			cameraPos.y += cameraSpeed * ts;
+		if (Cyber::Input::IsKeyPressed(CB_KEY_RIGHT))
+			cameraPos.x -= cameraSpeed * ts;
+		if (Cyber::Input::IsKeyPressed(CB_KEY_LEFT))
+			cameraPos.x += cameraSpeed * ts;
+		if (Cyber::Input::IsKeyPressed(CB_KEY_A))
+			m_Camera.SetRotation(m_Camera.GetRotation() + 0.2 * ts);
+		if (Cyber::Input::IsKeyPressed(CB_KEY_D))
+			m_Camera.SetRotation(m_Camera.GetRotation() - 0.2 * ts);
+		m_Camera.SetPosition(cameraPos);
+	}
+	Cyber::Renderer::BeginScene(m_Camera);
+	if (m_useColor)
+	{
+		Cyber::Renderer::DrawQuad({ 0,0 }, {m_Texture->GetWidth(),m_Texture->GetHeight()},m_Color);
+	}
+	else if(m_useTint)
+	{
+		Cyber::Renderer::DrawQuad({ 0,0 }, { m_Texture->GetWidth(),m_Texture->GetHeight() }, m_Texture,1,m_Color);
+	}
+	else {
+		Cyber::Renderer::DrawQuad({ 0,0 }, { m_Texture->GetWidth(),m_Texture->GetHeight() }, m_Texture);
+	}
+	Cyber::Renderer::EndScene();
 }
 
 bool DemoLayer::onEvent(const Cyber::Event* e) {
@@ -135,11 +77,8 @@ bool DemoLayer::onEvent(const Cyber::Event* e) {
 	{
 	case Cyber::EventType::KeyPressed:
 	{
+		if (ImGui::GetIO().WantCaptureKeyboard) return true;
 		Cyber::KeyPressedEvent* ev = (Cyber::KeyPressedEvent*)e;
-		if (m_ignoreNext) {
-			m_ignoreNext = false;
-			return true;
-		}
 		switch (ev->key)
 		{
 		case CB_KEY_ESCAPE:
