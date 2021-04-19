@@ -1,6 +1,6 @@
 workspace "Cyber-2D"
 	architecture "x86_64"
-	startproject "Sandbox"
+	startproject "Cyber-Editor"
 
 	configurations
 	{
