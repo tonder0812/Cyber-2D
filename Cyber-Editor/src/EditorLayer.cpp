@@ -8,16 +8,27 @@
 #include "OpenGL/OpenGLRenderer.h"
 #include "OpenGL/OpenGLTexture.h"
 #include "OpenGL/OpenGLFrameBuffer.h"
+#include "Scene/Scene.h"
+#include "Scene/Entity.h"
+#include "Scene/Components.h"
+
 
 namespace Cyber {
 	void EditorLayer::onAttach() {
-
-
 		Cyber::FramebufferSpecification fbSpec;
 		fbSpec.Attachments = { Cyber::FramebufferTextureFormat::RGBA8, Cyber::FramebufferTextureFormat::Depth };
 		fbSpec.Width = 1;
 		fbSpec.Height = 1;
 		m_Framebuffer = new Cyber::Framebuffer(fbSpec);
+		m_Square = m_CurrentScene.CreateEntity("Square");
+		m_Square.AddComponent<SpriteRendererComponent>();
+		m_Square.GetComponent<TransformComponent>().Scale = { 300,300 ,1 };
+		m_Square.GetComponent<TransformComponent>().Translation.x = -150;
+		m_Square2 = m_CurrentScene.CreateEntity("Square2");
+		auto texture = std::make_shared<Texture>("./assets/textures/cic.png");
+		m_Square2.AddComponent<SpriteRendererComponent>(texture);
+		m_Square2.GetComponent<TransformComponent>().Scale = { 300,300 ,1 };
+		m_Square2.GetComponent<TransformComponent>().Translation.x = 150;
 	}
 
 	void EditorLayer::onDetach() {
@@ -28,8 +39,9 @@ namespace Cyber {
 
 		StartDockspace();
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("viewport");
 
+		//Viewport
+		ImGui::Begin("viewport");
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 		auto viewportOffset = ImGui::GetWindowPos();
@@ -39,6 +51,7 @@ namespace Cyber {
 		ImGui::End();
 		ImGui::PopStyleVar();
 
+		m_CurrentScene.OnImGui();
 		ImGui::End();
 	}
 	void EditorLayer::onUpdate(float ts) {
@@ -47,13 +60,13 @@ namespace Cyber {
 			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
 		{
 			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_Camera.SetProjection(-(m_ViewportSize.x / 2.0f), m_ViewportSize.x / 2.0f, -(m_ViewportSize.y / 2.0f), m_ViewportSize.y / 2.0f);
+			m_Camera.SetProjection(-(m_ViewportSize.x / 2.0f), m_ViewportSize.x / 2.0f, -(m_ViewportSize.y / 2.0f), m_ViewportSize.y / 2.0f, -100, 100);
 		}
 		m_Framebuffer->Bind();
 		Cyber::Renderer::SetClearColor({ 0.1,0.1,0.1,1 });
 		Cyber::Renderer::Clear();
 		Renderer::BeginScene(m_Camera);
-		Renderer::DrawQuad({ 0,0 }, { 100,100 }, { 1,0,0,1 });
+		m_CurrentScene.OnUpdateEditor(ts);
 		Renderer::EndScene();
 		m_Framebuffer->Unbind();
 	}
