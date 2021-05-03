@@ -10,6 +10,7 @@ namespace Cyber {
 		uint32_t GetWidth() const { return m_Width; };
 		uint32_t GetHeight() const { return m_Height; };
 		uint32_t GetID() const { return m_ID; };
+		std::string GetPath() const { return m_Path; };
 		uint8_t GetChannels() const;
 		void SetData(void* data, uint32_t size);
 		void Bind(uint32_t slot = 0) const;

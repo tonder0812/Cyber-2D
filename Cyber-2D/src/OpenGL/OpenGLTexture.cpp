@@ -21,6 +21,7 @@ namespace Cyber {
 	}
 
 	Texture::Texture(const std::string& path)
+		:m_Path(path)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
