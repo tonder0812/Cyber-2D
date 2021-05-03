@@ -23,6 +23,7 @@ IncludeDir["Glad"] = "Cyber-2D/vendor/Glad/include"
 IncludeDir["ImGui"] = "Cyber-2D/vendor/imgui"
 IncludeDir["glm"] = "Cyber-2D/vendor/glm"
 IncludeDir["stb_image"] = "Cyber-2D/vendor/stb_image"
+IncludeDir["entt"] = "Cyber-2D/vendor/entt/include"
 
 group "Dependencies"
 	include "Cyber-2D/vendor/GLFW"
@@ -67,7 +68,8 @@ project "Cyber-2D"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+        "%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
 	}
 
 	links
@@ -170,7 +172,8 @@ project "Cyber-Editor"
 		"Cyber-2D/vendor/spdlog/include",
 		"Cyber-2D/src",
 		"Cyber-2D/vendor",
-		"%{IncludeDir.glm}"
+    "%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links
