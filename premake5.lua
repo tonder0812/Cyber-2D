@@ -24,6 +24,7 @@ IncludeDir["ImGui"] = "Cyber-2D/vendor/imgui"
 IncludeDir["glm"] = "Cyber-2D/vendor/glm"
 IncludeDir["stb_image"] = "Cyber-2D/vendor/stb_image"
 IncludeDir["entt"] = "Cyber-2D/vendor/entt/include"
+IncludeDir["python"] = "packages/python.3.9.4/tools/include"
 
 group "Dependencies"
 	include "Cyber-2D/vendor/GLFW"
@@ -47,6 +48,7 @@ project "Cyber-2D"
 	files
 	{
 		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.c",
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/vendor/stb_image/**.h",
 		"%{prj.name}/vendor/stb_image/**.cpp",
@@ -68,8 +70,9 @@ project "Cyber-2D"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-        "%{IncludeDir.stb_image}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.python}"
 	}
 
 	links
@@ -77,7 +80,8 @@ project "Cyber-2D"
 		"GLFW",
 		"Glad",
 		"ImGui",
-		"opengl32.lib"
+		"opengl32.lib",
+		"packages/python.3.9.4/tools/libs/python39.lib"
 	}
 
 	filter "system:windows"
@@ -85,7 +89,7 @@ project "Cyber-2D"
 
 		defines
 		{
-      "CB_PLATFORM_WINDOWS"
+			"CB_PLATFORM_WINDOWS"
 		}
 
 	filter "configurations:Debug"
@@ -103,6 +107,9 @@ project "Cyber-2D"
 		runtime "Release"
 		optimize "on"
 
+	filter "files:**.c"
+		flags {"NoPCH"}
+
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
@@ -116,6 +123,7 @@ project "Sandbox"
 	files
 	{
 		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.c",
 		"%{prj.name}/src/**.cpp"
 	}
 
@@ -130,7 +138,8 @@ project "Sandbox"
 
 	links
 	{
-		"Cyber-2D"
+		"Cyber-2D",
+		"packages/python.3.9.4/tools/libs/python39.lib"
 	}
 
 	filter "system:windows"
@@ -164,6 +173,7 @@ project "Cyber-Editor"
 	files
 	{
 		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.c",
 		"%{prj.name}/src/**.cpp"
 	}
 
@@ -172,13 +182,14 @@ project "Cyber-Editor"
 		"Cyber-2D/vendor/spdlog/include",
 		"Cyber-2D/src",
 		"Cyber-2D/vendor",
-    "%{IncludeDir.glm}",
+		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}"
 	}
 
 	links
 	{
-		"Cyber-2D"
+		"Cyber-2D",
+		"packages/python.3.9.4/tools/libs/python39.lib"
 	}
 
 	filter "system:windows"

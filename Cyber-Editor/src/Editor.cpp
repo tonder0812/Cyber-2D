@@ -6,7 +6,8 @@ namespace Cyber {
 	class Editor : public Application
 	{
 	public:
-		Editor() {
+		Editor(int argc, char** argv)
+			: Application(argc, argv) {
 			name = "Cyber Editor";
 			CB_INFO("STARTING EDITOR");
 			pushLayer(new EditorLayer());
@@ -17,6 +18,6 @@ namespace Cyber {
 	private:
 	};
 }
-Cyber::Application* CreateAplication() {
-	return new Cyber::Editor;
+Cyber::Application* CreateAplication(int argc, char** argv) {
+	return new Cyber::Editor(argc, argv);
 }

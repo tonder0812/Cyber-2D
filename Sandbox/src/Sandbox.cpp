@@ -6,7 +6,8 @@
 class Sandbox : public Cyber::Application
 {
 public:
-	Sandbox(){
+	Sandbox(int argc, char** argv) :
+		Application(argc, argv) {
 		//Application();
 		name = "Sandbox";
 		CB_INFO("STARTING SANDBOX");
@@ -18,6 +19,6 @@ public:
 private:
 };
 
-Cyber::Application* CreateAplication() {
-	return new Sandbox;
+Cyber::Application* CreateAplication(int argc, char** argv) {
+	return new Sandbox(argc, argv);
 }

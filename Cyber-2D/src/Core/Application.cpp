@@ -4,16 +4,37 @@
 #include "GLFW/glfw3.h"
 #include "OpenGL/OpenGLRenderer.h"
 #include "ImGUILayer.h"
+#include "Python/Python.h"
+extern "C" PyObject * PyInit_Cyber(void);
 
 namespace Cyber {
 	float mouseX = 0, mouseY = 0;
 	bool mousePressed = false;
+
 	Application* Application::s_Instance = nullptr;
-	Application::Application() {
+	Application::Application(int argc, char** argv) {
 		if (s_Instance != nullptr)
 		{
 			CB_CORE_CRITICAL("Aplication Already Open");
 		}
+
+		//decode argv
+		wchar_t** _argv = new wchar_t* [argc];
+		for (int i = 0; i < argc; i++) {
+			_argv[i] = Py_DecodeLocale(argv[i], NULL);
+			m_args.emplace_back(argv[i]);
+			CB_CORE_TRACE(argv[i]);
+		}
+
+		//set program name
+		Py_SetProgramName(_argv[0]);
+		//add cyber module
+		Py_Import_Module(Cyber);
+		//start python interpreter
+		Py_Initialize();
+		//set sys.argv
+		PySys_SetArgv(argc, _argv);
+
 		s_Instance = this;
 		m_LayerStack = new LayerStack();
 		m_Window = new Window(WindowProps(1900, 980, "TEST", true, m_Minimized));
@@ -56,6 +77,7 @@ namespace Cyber {
 	Application::~Application() {
 		m_LayerStack->popOverlay(m_ImGuiLayer);
 		Renderer::Shutdown();
+		Py_FinalizeEx();
 		delete m_LayerStack;
 		delete m_Window;
 	}

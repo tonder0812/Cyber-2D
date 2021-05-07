@@ -7,7 +7,7 @@ namespace Cyber {
 	class LayerStack;
 	class Application {
 	public:
-		Application();
+		Application(int argc, char** argv);
 		virtual ~Application();
 		virtual void Run();
 		std::string name;
@@ -18,6 +18,7 @@ namespace Cyber {
 		static Application& Get() { return *s_Instance; }
 		void pushLayer(Layer* layer);
 		void popLayer(Layer* layer);
+		const std::vector<std::string> GetArgs() { return m_args; };
 	private:
 		static Application* s_Instance;
 		Window* m_Window;
@@ -27,6 +28,7 @@ namespace Cyber {
 		bool onWindowClose();
 		ImGUILayer* m_ImGuiLayer;
 		float lastFrameTime = 0;
+		std::vector<std::string> m_args;
 	};
 }
 
