@@ -6752,7 +6752,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     {}
 
     const sparse_set<Entity> & candidate() const ENTT_NOEXCEPT {
-        return *std::min({ static_cast<const sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
+        return *(std::min)({ static_cast<const sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
             return lhs->size() < rhs->size();
         });
     }
@@ -6828,7 +6828,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     size_type size() const ENTT_NOEXCEPT {
-        return std::min({ std::get<pool_type<Component> *>(pools)->size()... });
+        return (std::min)({ std::get<pool_type<Component> *>(pools)->size()... });
     }
 
     /**
@@ -8818,7 +8818,7 @@ public:
                 groups.insert(next, std::move(candidate));
             }
 
-            ((std::get<pool_handler<std::decay_t<Owned>> &>(cpools).super = std::max(std::get<pool_handler<std::decay_t<Owned>> &>(cpools).super, size)), ...);
+            ((std::get<pool_handler<std::decay_t<Owned>> &>(cpools).super = (std::max)(std::get<pool_handler<std::decay_t<Owned>> &>(cpools).super, size)), ...);
 
             (on_construct<std::decay_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::decay_t<Owned>>>(*handler), ...);
             (on_construct<std::decay_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::decay_t<Get>>>(*handler), ...);
