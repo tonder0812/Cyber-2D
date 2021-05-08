@@ -25,6 +25,7 @@ IncludeDir["glm"] = "Cyber-2D/vendor/glm"
 IncludeDir["stb_image"] = "Cyber-2D/vendor/stb_image"
 IncludeDir["entt"] = "Cyber-2D/vendor/entt/include"
 IncludeDir["python"] = "packages/python.3.9.4/tools/include"
+IncludeDir["PyGLM"] = "Cyber-2D/vendor/PyGLM"
 
 group "Dependencies"
 	include "Cyber-2D/vendor/GLFW"
@@ -52,6 +53,9 @@ project "Cyber-2D"
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/vendor/stb_image/**.h",
 		"%{prj.name}/vendor/stb_image/**.cpp",
+		"%{prj.name}/vendor/PyGLM/**.h",
+		"%{prj.name}/vendor/PyGLM/**.c",
+		"%{prj.name}/vendor/PyGLM/**.cpp",
 		"%{prj.name}/vendor/glm/glm/**.hpp",
 		"%{prj.name}/vendor/glm/glm/**.inl",
 	}
@@ -72,7 +76,8 @@ project "Cyber-2D"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.python}"
+		"%{IncludeDir.python}",
+		"%{IncludeDir.PyGLM}"
 	}
 
 	links
@@ -110,6 +115,9 @@ project "Cyber-2D"
 	filter "files:**.c"
 		flags {"NoPCH"}
 
+	filter "files:**/vendor/**.cpp"
+		flags {"NoPCH"}
+
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
@@ -133,7 +141,9 @@ project "Sandbox"
 		"Cyber-2D/src",
 		"Cyber-2D/vendor",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.python}",
+		"%{IncludeDir.PyGLM}"
 	}
 
 	links
@@ -183,7 +193,9 @@ project "Cyber-Editor"
 		"Cyber-2D/src",
 		"Cyber-2D/vendor",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.python}",
+		"%{IncludeDir.PyGLM}"
 	}
 
 	links

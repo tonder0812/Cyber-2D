@@ -20,7 +20,7 @@ namespace Cyber {
 	private:
 		void StartDockspace();
 	private:
-		Scene m_CurrentScene;
+		Scene* m_CurrentScene;
 		Entity m_Square;
 		Entity m_Square2;
 		glm::vec2 m_ViewportSize = { 1,1 };

@@ -15,23 +15,27 @@
 
 namespace Cyber {
 	void EditorLayer::onAttach() {
+		m_CurrentScene = new Scene();
 		Cyber::FramebufferSpecification fbSpec;
 		fbSpec.Attachments = { Cyber::FramebufferTextureFormat::RGBA8, Cyber::FramebufferTextureFormat::Depth };
 		fbSpec.Width = 1;
 		fbSpec.Height = 1;
 		m_Framebuffer = new Cyber::Framebuffer(fbSpec);
-		m_Square = m_CurrentScene.CreateEntity("Square");
+		m_Square = m_CurrentScene->CreateEntity("Square");
 		m_Square.AddComponent<SpriteRendererComponent>();
 		m_Square.GetComponent<TransformComponent>().Scale = { 300,300 ,1 };
-		m_Square.GetComponent<TransformComponent>().Translation.x = -150;
-		m_Square2 = m_CurrentScene.CreateEntity("Square2");
+		m_Square.GetComponent<TransformComponent>().Translation->super_type.x = -150;
+		m_Square.AddComponent<ScriptComponent>("testt");
+		m_Square2 = m_CurrentScene->CreateEntity("Square2");
+		m_Square2.AddComponent<ScriptComponent>("testt2");
 		auto texture = std::make_shared<Texture>("./assets/textures/cic.png");
 		m_Square2.AddComponent<SpriteRendererComponent>(texture);
 		m_Square2.GetComponent<TransformComponent>().Scale = { 300,300 ,1 };
-		m_Square2.GetComponent<TransformComponent>().Translation.x = 150;
+		m_Square2.GetComponent<TransformComponent>().Translation->super_type.x = 150;
 	}
 
 	void EditorLayer::onDetach() {
+		delete m_CurrentScene;
 		delete m_Framebuffer;
 	}
 
@@ -51,7 +55,7 @@ namespace Cyber {
 		ImGui::End();
 		ImGui::PopStyleVar();
 
-		m_CurrentScene.OnImGui();
+		m_CurrentScene->OnImGui();
 		ImGui::End();
 	}
 	void EditorLayer::onUpdate(float ts) {
@@ -66,7 +70,7 @@ namespace Cyber {
 		Cyber::Renderer::SetClearColor({ 0.1,0.1,0.1,1 });
 		Cyber::Renderer::Clear();
 		Renderer::BeginScene(m_Camera);
-		m_CurrentScene.OnUpdateEditor(ts);
+		m_CurrentScene->OnUpdateEditor(ts);
 		Renderer::EndScene();
 		m_Framebuffer->Unbind();
 	}

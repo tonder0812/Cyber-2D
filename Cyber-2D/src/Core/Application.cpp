@@ -6,6 +6,7 @@
 #include "ImGUILayer.h"
 #include "Python/Python.h"
 extern "C" PyObject * PyInit_Cyber(void);
+extern "C" PyObject * PyInit_glm(void);
 
 namespace Cyber {
 	float mouseX = 0, mouseY = 0;
@@ -30,10 +31,15 @@ namespace Cyber {
 		Py_SetProgramName(_argv[0]);
 		//add cyber module
 		Py_Import_Module(Cyber);
+		Py_Import_Module(glm);
 		//start python interpreter
 		Py_Initialize();
 		//set sys.argv
 		PySys_SetArgv(argc, _argv);
+		//add assets/scripts to search path
+		PyObject* sysPath = PySys_GetObject("path");
+		PyList_Append(sysPath, PyUnicode_FromString("./assets/scripts"));
+
 
 		s_Instance = this;
 		m_LayerStack = new LayerStack();
@@ -77,9 +83,9 @@ namespace Cyber {
 	Application::~Application() {
 		m_LayerStack->popOverlay(m_ImGuiLayer);
 		Renderer::Shutdown();
-		Py_FinalizeEx();
 		delete m_LayerStack;
 		delete m_Window;
+		Py_FinalizeEx();
 	}
 
 	void Application::Run() {

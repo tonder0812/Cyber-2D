@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Entity.h"
 #include "Components.h"
+#include "Python/Utils.h"
 #include "Utils/Utils.h"
 #include "OpenGL/OpenGLRenderer.h"
 #include <Imgui.h>
@@ -12,10 +13,22 @@ namespace Cyber {
 
 	Scene::Scene()
 	{
+
 	}
 
 	Scene::~Scene()
 	{
+		m_Registry.view<ScriptComponent>().each([=](auto entity, auto& sc)
+			{
+				sc.Destroy();
+				if (PyErr_Occurred())
+					CB_CORE_ERROR(PythonUtils::GetErrorMessage());
+			});
+		m_Registry.view<TransformComponent>().each([=](auto entity, auto& transform)
+			{
+				transform.Destroy();
+			});
+		m_Registry.clear();
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)
@@ -35,31 +48,45 @@ namespace Cyber {
 
 	void Scene::OnUpdateEditor(float ts)
 	{
-		/*auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto entity : group)
+		auto ScriptView = m_Registry.view<ScriptComponent>();
+		for (auto et : ScriptView)
 		{
-			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			auto& script = ScriptView.get<ScriptComponent>(et);
+			if (!script.initialized) {
+				script.initialized = true;
+				if (script.onStart) {
+					PyObject_CallObject(script.onStart, NULL);
+					if (PyErr_Occurred())
+						CB_CORE_ERROR(PythonUtils::GetErrorMessage());
+				}
+			}
+			if (script.onUpdate) {
+				PyObject* pArgs, * pValue;
+				pArgs = PyTuple_New(2);
+				pValue = PyFloat_FromDouble(ts);
+				PyTuple_SetItem(pArgs, 0, pValue);
+				PyObject* translation = (PyObject*)Entity(et, this).GetComponent<TransformComponent>().Translation;
+				Py_INCREF(translation);
+				PyTuple_SetItem(pArgs, 1, translation);
+				PyObject_CallObject(script.onUpdate, pArgs);
+				Py_DECREF(pArgs);
+				if (PyErr_Occurred())
+					CB_CORE_ERROR(PythonUtils::GetErrorMessage());
+			}
+		}
+
+		auto SpriteGroup = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto et : SpriteGroup)
+		{
+			auto [transform, sprite] = SpriteGroup.get<TransformComponent, SpriteRendererComponent>(et);
 			if (sprite.UseTexture) {
-				Renderer::DrawQuad(transform.GetTransform(), sprite.texture.get(), 0, sprite.Color);
+				Renderer::DrawQuad(transform.GetTransform(), sprite.texture.get(), 1, sprite.Color);
 			}
 			else {
 				Renderer::DrawQuad(transform.GetTransform(), sprite.Color);
 			}
-		}*/
-		m_Registry.each([&](auto entityID)
-			{
-				Entity entity = Entity(entityID, this);
-				if (entity.HasComponent<SpriteRendererComponent>()) {
-					TransformComponent& transform = entity.GetComponent<TransformComponent>();
-					SpriteRendererComponent& sprite = entity.GetComponent<SpriteRendererComponent>();
-					if (sprite.UseTexture) {
-						Renderer::DrawQuad(transform.GetTransform(), sprite.texture.get(), 1, sprite.Color);
-					}
-					else {
-						Renderer::DrawQuad(transform.GetTransform(), sprite.Color);
-					}
-				}
-			});
+		}
+
 	}
 
 	void Scene::OnImGui() {
@@ -96,7 +123,7 @@ namespace Cyber {
 		}
 		ImGui::Text("Transform");
 		TransformComponent& transform = m_SelectedEntity->GetComponent<TransformComponent>();
-		ImGui::DragFloat3("Translation", &transform.Translation.x);
+		ImGui::DragFloat3("Translation", &(transform.Translation->super_type.x));
 		float rotation = glm::degrees(transform.Rotation);
 		if (ImGui::DragFloat("Rotation", &rotation)) {
 			transform.Rotation = glm::radians(rotation);
@@ -131,6 +158,7 @@ namespace Cyber {
 		static_assert(false);
 	}
 
+
 	template<>
 	void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
 	{
@@ -145,5 +173,11 @@ namespace Cyber {
 	void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component)
 	{
 	}
+
+	template<>
+	void Scene::OnComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component)
+	{
+	}
+
 
 }
