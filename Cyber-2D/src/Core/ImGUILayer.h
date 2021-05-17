@@ -13,7 +13,7 @@ namespace Cyber {
 		void Begin();
 		void End();
 	private:
-		bool m_BlockEvents = true;
+		std::string m_iniPath;
 	};
 }
 

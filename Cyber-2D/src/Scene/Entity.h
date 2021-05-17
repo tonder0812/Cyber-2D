@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Scene.h"
-
+#include "Core/Log.h"
 #include "entt.hpp"
 
 namespace Cyber {
@@ -36,15 +36,11 @@ namespace Cyber {
 		}
 
 		template<typename T>
-		void RemoveComponent()
-		{
-			CB_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
-			m_Scene->m_Registry.remove<T>(m_EntityHandle);
-		}
+		void RemoveComponent();
 
-		operator bool() const { return m_EntityHandle != entt::null; }
+		operator bool() const { return (m_EntityHandle != entt::null && m_Scene->Valid(m_EntityHandle)); }
 		operator entt::entity() const { return m_EntityHandle; }
-		operator uint32_t() const { return (uint32_t)m_EntityHandle; }
+		operator int() const { return (int)m_EntityHandle; }
 
 		bool operator==(const Entity& other) const
 		{

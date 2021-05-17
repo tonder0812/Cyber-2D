@@ -7,3 +7,6 @@
 [submodule "Cyber-2D/vendor/spdlog"]
 	path = Cyber-2D/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "Cyber-2D/vendor/yaml-cpp"]
+	path = Cyber-2D/vendor/yaml-cpp
+	url = https://github.com/thecherno/yaml-cpp

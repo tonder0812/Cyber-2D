@@ -11,24 +11,38 @@
 
 namespace Cyber {
 
-	Scene::Scene()
+	static void rotate(glm::vec3 a[], int n, float x_pivot, float y_pivot,
+		float angle)
 	{
+		int i = 0;
+		while (i < n) {
+			int x_shifted = a[i].x - x_pivot;
+			int y_shifted = a[i].y - y_pivot;
+			a[i].x = x_pivot
+				+ (x_shifted * glm::cos(angle)
+					- y_shifted * glm::sin(angle));
+			a[i].y = y_pivot
+				+ (x_shifted * glm::sin(angle)
+					+ y_shifted * glm::cos(angle));
+			i++;
+		}
+	}
 
+	Scene::Scene(bool empty)
+	{
+		if (!empty) {
+			Entity MainCamera = CreateEntity("Main Camera");
+			MainCamera.AddComponent<CameraComponent>();
+		}
 	}
 
 	Scene::~Scene()
 	{
-		m_Registry.view<ScriptComponent>().each([=](auto entity, auto& sc)
+		m_Registry.each([&](auto entityID)
 			{
-				sc.Destroy();
-				if (PyErr_Occurred())
-					CB_CORE_ERROR(PythonUtils::GetErrorMessage());
+				Entity entity{ entityID , this };
+				DestroyEntity(entity);
 			});
-		m_Registry.view<TransformComponent>().each([=](auto entity, auto& transform)
-			{
-				transform.Destroy();
-			});
-		m_Registry.clear();
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)
@@ -37,16 +51,50 @@ namespace Cyber {
 		entity.AddComponent<TransformComponent>();
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
+		entity.AddComponent<OrderComponent>(++m_Nentities);
 		return entity;
 	}
 
 	void Scene::DestroyEntity(Entity entity)
 	{
+		if (entity.HasComponent<TransformComponent>())entity.GetComponent<TransformComponent>().Destroy();
+		if (entity.HasComponent<ScriptComponent>())entity.GetComponent<ScriptComponent>().Destroy();
+		if (entity.HasComponent<SpriteRendererComponent>())entity.GetComponent<SpriteRendererComponent>().Destroy();
 		m_Registry.destroy(entity);
 	}
 
+	void Scene::OnUpdateEditor(float ts, EditorCamera& editorCamera, std::shared_ptr<Texture> cameraTexture)
+	{
+		Renderer::BeginScene(editorCamera);
+		RenderSprites();
+		Renderer::DrawQuad({ 1000,1000 ,1000 }, { 1,1 }, cameraTexture.get());
+		Renderer::EndScene();
+		Renderer::BeginUI();
+		Renderer::BeginScene(editorCamera);
+		Entity cameraEntity = GetPrimaryCameraEntity();
+		if (cameraEntity) {
+			SceneCamera& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+			glm::vec3& position = cameraEntity.GetComponent<TransformComponent>().Transform->Translation->super_type;
+			glm::vec3& scale = cameraEntity.GetComponent<TransformComponent>().Transform->Scale->super_type;
+			glm::mat4 trans = glm::scale(glm::translate(glm::mat4(1), position), { 120 / 120.0f ,90 / 120.0f,1 });
+			float farClip = editorCamera.GetPosition().z + editorCamera.GetFar() - 0;
+			trans[3].z = farClip;
+			Renderer::DrawQuad(trans, cameraTexture.get(), 1, glm::vec4(1), cameraEntity);
+			glm::vec3 verts[] = {
+				{position.x - camera.GetSize() * scale.x * camera.GetAspectRatio() * 0.5f, position.y - camera.GetSize() * scale.y * 0.5f, farClip},
+				{position.x - camera.GetSize() * scale.x * camera.GetAspectRatio() * 0.5f, position.y + camera.GetSize() * scale.y * 0.5f, farClip},
+				{position.x + camera.GetSize() * scale.x * camera.GetAspectRatio() * 0.5f, position.y + camera.GetSize() * scale.y * 0.5f, farClip},
+				{position.x + camera.GetSize() * scale.x * camera.GetAspectRatio() * 0.5f, position.y - camera.GetSize() * scale.y * 0.5f, farClip},
+			};
 
-	void Scene::OnUpdateEditor(float ts)
+			rotate(verts, 4, position.x, position.y, cameraEntity.GetComponent<TransformComponent>().Transform->Rotation);
+			Renderer::DrawLines(verts, 4);
+		}
+		Renderer::EndScene();
+	}
+
+
+	void Scene::OnUpdateRuntime(float ts)
 	{
 		auto ScriptView = m_Registry.view<ScriptComponent>();
 		for (auto et : ScriptView)
@@ -57,7 +105,7 @@ namespace Cyber {
 				if (script.onStart) {
 					PyObject_CallObject(script.onStart, NULL);
 					if (PyErr_Occurred())
-						CB_CORE_ERROR(PythonUtils::GetErrorMessage());
+						CB_ERROR(PythonUtils::GetErrorMessage());
 				}
 			}
 			if (script.onUpdate) {
@@ -65,91 +113,83 @@ namespace Cyber {
 				pArgs = PyTuple_New(2);
 				pValue = PyFloat_FromDouble(ts);
 				PyTuple_SetItem(pArgs, 0, pValue);
-				PyObject* translation = (PyObject*)Entity(et, this).GetComponent<TransformComponent>().Translation;
-				Py_INCREF(translation);
-				PyTuple_SetItem(pArgs, 1, translation);
+
+				PyObject* transform = (PyObject*)Entity(et, this).GetComponent<TransformComponent>().Transform;
+				Py_INCREF(transform);
+				PyTuple_SetItem(pArgs, 1, transform);
+
 				PyObject_CallObject(script.onUpdate, pArgs);
-				Py_DECREF(pArgs);
 				if (PyErr_Occurred())
-					CB_CORE_ERROR(PythonUtils::GetErrorMessage());
+					CB_ERROR(PythonUtils::GetErrorMessage());
+				Py_DECREF(pArgs);
 			}
 		}
+		Entity cameraEntity = GetPrimaryCameraEntity();
+		if (cameraEntity) {
 
+			Renderer::BeginScene(Camera{ cameraEntity.GetComponent<CameraComponent>().Camera.GetProjection() , glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform()) });
+			RenderSprites();
+			Renderer::EndScene();
+		}
+	}
+
+	void Scene::RenderSprites() {
 		auto SpriteGroup = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		SpriteGroup.sort<TransformComponent>([](const auto& lhs, const auto& rhs) {
+			return lhs.Transform->Translation->super_type.z < rhs.Transform->Translation->super_type.z;
+			});
 		for (auto et : SpriteGroup)
 		{
 			auto [transform, sprite] = SpriteGroup.get<TransformComponent, SpriteRendererComponent>(et);
 			if (sprite.UseTexture) {
-				Renderer::DrawQuad(transform.GetTransform(), sprite.texture.get(), 1, sprite.Color);
+				Renderer::DrawQuad(transform.GetTransform(), sprite.texture.get(), 1, sprite.Color->super_type, (int)et);
 			}
 			else {
-				Renderer::DrawQuad(transform.GetTransform(), sprite.Color);
+				Renderer::DrawQuad(transform.GetTransform(), sprite.Color->super_type, (int)et);
 			}
 		}
-
 	}
 
-	void Scene::OnImGui() {
-		//Scene hierarchy
-		ImGui::Begin("Scene hierarchy");
-		m_Registry.each([&](auto entityID)
-			{
-				Entity* entity = new Entity(entityID, this);
-				std::string tag = entity->GetComponent<TagComponent>().Tag;
-				if (ImGui::Button(tag.c_str())) {
-					if (m_SelectedEntity) {
-						delete m_SelectedEntity;
-					}
-					m_SelectedEntity = entity;
-				}
-				else {
-					delete entity;
-				}
-			});
-		ImGui::End();
-		//Properties
-		ImGui::Begin("Properties");
-		if (m_SelectedEntity == nullptr) {
-			ImGui::End();
-			return;
-		}
-		std::string& tag = m_SelectedEntity->GetComponent<TagComponent>().Tag;
-		char buffer[256];
-		memset(buffer, 0, sizeof(buffer));
-		std::strncpy(buffer, tag.c_str(), sizeof(buffer));
-		if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
+	void Scene::OnViewportResize(uint32_t width, uint32_t height)
+	{
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
+
+		ResizeCameras();
+
+	}
+	void Scene::ResizeCameras()
+	{
+		// Resize our non-FixedAspectRatio cameras
+		auto view = m_Registry.view<CameraComponent>();
+		for (auto entity : view)
 		{
-			tag = std::string(buffer);
+			auto& cameraComponent = view.get<CameraComponent>(entity);
+			if (!cameraComponent.FixedAspectRatio)
+				cameraComponent.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 		}
-		ImGui::Text("Transform");
-		TransformComponent& transform = m_SelectedEntity->GetComponent<TransformComponent>();
-		ImGui::DragFloat3("Translation", &(transform.Translation->super_type.x));
-		float rotation = glm::degrees(transform.Rotation);
-		if (ImGui::DragFloat("Rotation", &rotation)) {
-			transform.Rotation = glm::radians(rotation);
-		}
-		ImGui::DragFloat3("Scale", &transform.Scale.x);
-		if (m_SelectedEntity->HasComponent<SpriteRendererComponent>())
+	}
+
+	void Scene::SetPrimaryCamera(Entity e) {
+		auto view = m_Registry.view<CameraComponent>();
+		for (auto entity : view)
 		{
-			ImGui::Text("Sprite");
-			SpriteRendererComponent& sprite = m_SelectedEntity->GetComponent<SpriteRendererComponent>();
-			ImGui::ColorEdit4("Color", &sprite.Color.r);
-			bool disabled = sprite.texture.get() == nullptr;
-			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, disabled);
-			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * (disabled ? 0.5f : 1.0f));
-			ImGui::Checkbox("Use texture", &sprite.UseTexture);
-			ImGui::PopStyleVar();
-			ImGui::PopItemFlag();
-			if (ImGui::Button("Load Image"))
-			{
-				std::string path = FileDialogs::OpenFile("Image Files(*.BMP;*.JPG;*.PNG)\0*.BMP;*.JPG;*.PNG\0All files (*.*)|*.*\0");
-				if (!path.empty()) {
-					auto texture = std::make_shared<Texture>(path);
-					sprite.texture = texture;
-				}
-			}
+			auto& cameraComponent = view.get<CameraComponent>(entity);
+			cameraComponent.Primary = false;
 		}
-		ImGui::End();
+		e.GetComponent<CameraComponent>().Primary = true;
+	}
+
+	Entity Scene::GetPrimaryCameraEntity()
+	{
+		auto view = m_Registry.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			const auto& camera = view.get<CameraComponent>(entity);
+			if (camera.Primary)
+				return Entity{ entity, this };
+		}
+		return {};
 	}
 
 	template<typename T>
@@ -172,6 +212,17 @@ namespace Cyber {
 	template<>
 	void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component)
 	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<OrderComponent>(Entity entity, OrderComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
+	{
+		component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 	}
 
 	template<>

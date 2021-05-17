@@ -1,5 +1,6 @@
 #include "Cyber.h"
 #include "ExampleLayer.h"
+#include "StandAloneLayer.h"
 #include "glm\glm.hpp"
 
 
@@ -11,7 +12,8 @@ public:
 		//Application();
 		name = "Sandbox";
 		CB_INFO("STARTING SANDBOX");
-		pushLayer(new DemoLayer());
+		//pushLayer(new DemoLayer());
+		pushLayer(new Cyber::StandAloneLayer());
 	}
 	~Sandbox() {
 

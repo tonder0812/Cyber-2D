@@ -7,10 +7,13 @@
 #include <glm/gtx/quaternion.hpp>
 #include "Python/Python.h"
 #include "Python/Utils.h"
+#include "Core/Application.h"
 #include "PyGLM/types/types.h"
+#include "Python/PyComponents.h"
+#include "SceneCamera.h"
 
 namespace Cyber {
-	
+
 	struct TagComponent
 	{
 		std::string Tag;
@@ -20,62 +23,91 @@ namespace Cyber {
 		TagComponent(const std::string& tag)
 			: Tag(tag) {}
 	};
-	
+
+	struct OrderComponent
+	{
+		int order;
+		OrderComponent(int order_)
+			:order(order_) {}
+	};
+
 	struct TransformComponent
 	{
-		vec<3, float>* Translation;
-
-		float Rotation = 0.0f;
-		glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
-
-		TransformComponent() :
-			TransformComponent({ 0.0f, 0.0f, 0.0f })
-		{
-		};
-		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const glm::vec3& translation) {
-			PyObject* pModule = PyImport_ImportModule("glm");
-			PyObject* pVec3Type = PyObject_GetAttrString(pModule, "vec3");
-			PyObject* argList = Py_BuildValue("(i,i,i)", translation.x, translation.y, translation.z);
-			Translation = (vec<3, float> *)PyObject_CallObject(pVec3Type, argList);
-			Py_DECREF(argList);
-			Py_DECREF(pVec3Type);
-			Py_DECREF(pModule);
+		TransformComponentObject* Transform;
+		TransformComponent() {
+			Transform = (TransformComponentObject*)PyObject_CallObject(Application::Get().GetPyCyber_Transform(), NULL);
+			if (PyErr_Occurred())
+				CB_CORE_ERROR(PythonUtils::GetErrorMessage());
+			CB_CORE_ASSERT(Transform, "Error when initializing Transform");
 		}
 		void Destroy() {
-			Py_DECREF(Translation);
+			Py_DECREF(Transform);
 		}
 
 		glm::mat4 GetTransform() const
 		{
-
-			return glm::translate(glm::mat4(1.0f), Translation->super_type)
-				* glm::rotate(glm::mat4(1.0f), Rotation, { 0,0,1 })
-				* glm::scale(glm::mat4(1.0f), Scale);
+			return glm::translate(glm::mat4(1.0f), Transform->Translation->super_type)
+				* glm::rotate(glm::mat4(1.0f), Transform->Rotation, { 0,0,1 })
+				* glm::scale(glm::mat4(1.0f), Transform->Scale->super_type);
 		}
+
 	};
-	
+
 	struct SpriteRendererComponent
 	{
-		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		vec<4, float>* Color;
 		std::shared_ptr<Texture> texture;
 		bool UseTexture = false;
-		SpriteRendererComponent() = default;
+		SpriteRendererComponent() {
+			PyObject* pVec4Type = Application::Get().GetPyGLM_Vec4();
+			Color = (vec<4, float> *)PyObject_CallObject(pVec4Type, NULL);
+			Color->super_type = { 1,1,1,1 };
+		};
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
 		SpriteRendererComponent(const glm::vec4& color)
-			: Color(color), texture(nullptr), UseTexture(false) {}
+			: texture(nullptr), UseTexture(false) {
+			PyObject* pVec4Type = Application::Get().GetPyGLM_Vec4();
+			Color = (vec<4, float> *)PyObject_CallObject(pVec4Type, NULL);
+			Color->super_type = color;
+		}
 		SpriteRendererComponent(std::shared_ptr<Texture> tex)
-			: Color({ 1,1,1,1 }), texture(tex), UseTexture(true) {}
+			: texture(tex), UseTexture(true) {
+			PyObject* pVec4Type = Application::Get().GetPyGLM_Vec4();
+			Color = (vec<4, float> *)PyObject_CallObject(pVec4Type, NULL);
+			Color->super_type = { 1,1,1,1 };
+		}
 		SpriteRendererComponent(const glm::vec4& color, std::shared_ptr<Texture> tex)
-			: Color(color), texture(tex), UseTexture(true) {}
+			: texture(tex), UseTexture(true) {
+			PyObject* pVec4Type = Application::Get().GetPyGLM_Vec4();
+			Color = (vec<4, float> *)PyObject_CallObject(pVec4Type, NULL);
+			Color->super_type = color;
+		}
+		void Destroy() {
+			Py_DECREF(Color);
+		}
 	};
-	
+
+	struct CameraComponent
+	{
+		SceneCamera Camera;
+		bool Primary = true;
+		bool FixedAspectRatio = false;
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent&) = default;
+	};
+
 	struct ScriptComponent
 	{
+		std::string name;
 		bool initialized = false;
 		PyObject* onUpdate = nullptr, * onStart = nullptr, * onDestroy = nullptr;
 		ScriptComponent() = default;
-		ScriptComponent(std::string filepath);
+		ScriptComponent(const std::string& name);
+		void Initialize();
 		void Destroy();
+		std::string GetName() { return m_name; };
+	private:
+		std::string m_name;
 	};
 }

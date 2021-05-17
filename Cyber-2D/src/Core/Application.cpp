@@ -5,6 +5,8 @@
 #include "OpenGL/OpenGLRenderer.h"
 #include "ImGUILayer.h"
 #include "Python/Python.h"
+#include "Python/Utils.h"
+#include <imgui.h>
 extern "C" PyObject * PyInit_Cyber(void);
 extern "C" PyObject * PyInit_glm(void);
 
@@ -19,6 +21,9 @@ namespace Cyber {
 			CB_CORE_CRITICAL("Aplication Already Open");
 		}
 
+		//Get cwd
+		m_CWD = std::filesystem::current_path();
+		CB_CORE_INFO(m_CWD.string());
 		//decode argv
 		wchar_t** _argv = new wchar_t* [argc];
 		for (int i = 0; i < argc; i++) {
@@ -26,6 +31,24 @@ namespace Cyber {
 			m_args.emplace_back(argv[i]);
 			CB_CORE_TRACE(argv[i]);
 		}
+		//set path
+		std::filesystem::path exePath = m_args[0];
+		m_Path = exePath.parent_path();
+		if (m_Path.is_relative()) {
+			m_Path = std::filesystem::canonical(m_Path);
+		}
+		std::wstring path = m_Path.wstring();
+		std::wstringstream ss;
+		ss << L".;";
+		ss << path << L"\\packages\\python.3.9.4\\tools;";
+		ss << path << L"\\packages\\python.3.9.4\\tools\\Lib;";
+		ss << path << L"\\packages\\python.3.9.4\\tools\\DLLs;";
+		ss << path << L"\\packages\\python.3.9.4\\tools\\Lib\\site-packages;";
+		ss << m_Path.parent_path().parent_path().parent_path().wstring() << L"\\packages\\python.3.9.4\\tools;";
+		ss << m_Path.parent_path().parent_path().parent_path().wstring() << L"\\packages\\python.3.9.4\\tools\\Lib;";
+		ss << m_Path.parent_path().parent_path().parent_path().wstring() << L"\\packages\\python.3.9.4\\tools\\DLLs;";
+		ss << m_Path.parent_path().parent_path().parent_path().wstring() << L"\\packages\\python.3.9.4\\tools\\Lib\\site-packages;";
+		Py_SetPath(ss.str().c_str());
 
 		//set program name
 		Py_SetProgramName(_argv[0]);
@@ -39,6 +62,15 @@ namespace Cyber {
 		//add assets/scripts to search path
 		PyObject* sysPath = PySys_GetObject("path");
 		PyList_Append(sysPath, PyUnicode_FromString("./assets/scripts"));
+		//save PyGLM and Cyber to save on importing it every time
+		m_PyGLM = PyImport_ImportModule("glm");
+		m_PyGLM_Vec2 = PythonUtils::GetFuncFromModule(m_PyGLM, "vec2");
+		m_PyGLM_Vec3 = PythonUtils::GetFuncFromModule(m_PyGLM, "vec3");
+		m_PyGLM_Vec4 = PythonUtils::GetFuncFromModule(m_PyGLM, "vec4");
+		m_PyGLM_Mat4 = PythonUtils::GetFuncFromModule(m_PyGLM, "mat4");
+
+		m_PyCyber = PyImport_ImportModule("Cyber");
+		m_PyCyber_Transform = PythonUtils::GetFuncFromModule(m_PyCyber, "TransformComponent");
 
 
 		s_Instance = this;
@@ -94,8 +126,10 @@ namespace Cyber {
 			float now = (float)glfwGetTime();
 			float ts = now - lastFrameTime;
 			lastFrameTime = now;
-			//CB_CORE_TRACE("Frame rate: {0:.2f}fps", 1 / ts);
 			m_LayerStack->onUpdate(ts);
+
+			ImGuiIO& io = ImGui::GetIO();
+			io.FontGlobalScale = m_fontSize / 40.0f;
 			m_ImGuiLayer->Begin();
 			m_LayerStack->onImGUI();
 			m_ImGuiLayer->End();

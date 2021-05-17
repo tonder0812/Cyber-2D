@@ -180,9 +180,7 @@ namespace Cyber {
 	void Framebuffer::ClearAttachment(uint32_t attachmentIndex, int value)
 	{
 		CB_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmentIndex out of range");
-
-		auto& spec = m_ColorAttachmentSpecifications[attachmentIndex];
-		GL_CHECK(glClearTexImage(m_ColorAttachments[attachmentIndex], 0, FBTextureFormatToGL(spec.TextureFormat), GL_INT, &value));
+		GL_CHECK(glClearBufferiv(GL_COLOR, attachmentIndex, &value));
 	}
 
 }

@@ -94,7 +94,7 @@ namespace Cyber {
 			i++;
 			#endif*/
 			if (layer->onEvent(e))
-				break;
+				return;
 		}
 		for (Layer* layer : m_Stack) {
 			/*#ifdef CB_DEBUG
@@ -102,7 +102,7 @@ namespace Cyber {
 			i++;
 			#endif*/
 			if (layer->onEvent(e))
-				break;
+				return;
 		}
 	}
 

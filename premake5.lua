@@ -26,11 +26,15 @@ IncludeDir["stb_image"] = "Cyber-2D/vendor/stb_image"
 IncludeDir["entt"] = "Cyber-2D/vendor/entt/include"
 IncludeDir["python"] = "packages/python.3.9.4/tools/include"
 IncludeDir["PyGLM"] = "Cyber-2D/vendor/PyGLM"
+IncludeDir["ImGuizmo"] = "Cyber-2D/vendor/ImGuizmo"
+IncludeDir["yaml_cpp"] = "Cyber-2D/vendor/yaml-cpp/include"
+
 
 group "Dependencies"
 	include "Cyber-2D/vendor/GLFW"
 	include "Cyber-2D/vendor/Glad"
-	include "Cyber-2D/vendor/imgui"
+  include "Cyber-2D/vendor/imgui"
+	include "Cyber-2D/vendor/yaml-cpp"
 group ""
 
 project "Cyber-2D"
@@ -58,6 +62,8 @@ project "Cyber-2D"
 		"%{prj.name}/vendor/PyGLM/**.cpp",
 		"%{prj.name}/vendor/glm/glm/**.hpp",
 		"%{prj.name}/vendor/glm/glm/**.inl",
+		"%{prj.name}/vendor/ImGuizmo/ImGuizmo.h",
+		"%{prj.name}/vendor/ImGuizmo/ImGuizmo.cpp"
 	}
 
 	defines
@@ -77,14 +83,17 @@ project "Cyber-2D"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.python}",
-		"%{IncludeDir.PyGLM}"
+    "%{IncludeDir.PyGLM}",
+    "%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.yaml_cpp}",
 	}
 
 	links
 	{
 		"GLFW",
 		"Glad",
-		"ImGui",
+    "ImGui",
+		"yaml-cpp",
 		"opengl32.lib",
 		"packages/python.3.9.4/tools/libs/python39.lib"
 	}
@@ -142,6 +151,7 @@ project "Sandbox"
 		"Cyber-2D/vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.ImGui}",
+    "%{IncludeDir.entt}",
 		"%{IncludeDir.python}",
 		"%{IncludeDir.PyGLM}"
 	}
@@ -195,13 +205,20 @@ project "Cyber-Editor"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.python}",
-		"%{IncludeDir.PyGLM}"
+		"%{IncludeDir.PyGLM}",
+		"%{IncludeDir.ImGuizmo}"
 	}
 
 	links
 	{
 		"Cyber-2D",
 		"packages/python.3.9.4/tools/libs/python39.lib"
+	}
+
+	postbuildcommands {
+		"{COPYFILE} ../packages/python.3.9.4/tools/python39.dll %{cfg.targetdir}",
+		"{COPYDIR} assets %{cfg.targetdir}/assets",
+		"{MKDIR} %{cfg.targetdir}/temp"
 	}
 
 	filter "system:windows"
@@ -221,3 +238,4 @@ project "Cyber-Editor"
 		defines "CB_RELEASE"
 		runtime "Release"
 		optimize "on"
+

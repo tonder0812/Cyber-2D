@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Core/Application.h"
 #include "OpenGLRenderer.h"
 #include "OpenGLErrorCallback.h"
 #include "glad/glad.h"
@@ -13,6 +14,8 @@ namespace Cyber {
 		float TexIndex;
 		float TilingFactor;
 		float Channels;
+
+		float id = -1;
 	};
 	struct RendererData
 	{
@@ -48,9 +51,10 @@ namespace Cyber {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color" },
 			{ ShaderDataType::Float2, "a_TexCoord" },
-			{ ShaderDataType::Float, "a_TexIndex" },
-			{ ShaderDataType::Float, "a_TilingFactor" },
-			{ ShaderDataType::Float, "a_Channels" }
+			{ ShaderDataType::Float , "a_TexIndex" },
+			{ ShaderDataType::Float , "a_TilingFactor" },
+			{ ShaderDataType::Float , "a_Channels" },
+			{ ShaderDataType::Float , "a_ID"}
 			});
 
 
@@ -81,7 +85,7 @@ namespace Cyber {
 		for (uint32_t i = 0; i < s_Data->MaxTextureSlots; i++)
 			samplers[i] = i;
 
-		s_Data->shader = new Shader("assets/shaders/Texture.glsl");
+		s_Data->shader = new Shader(Application::Get().getPath().string() + "/assets/shaders/Texture.glsl");
 		s_Data->shader->Bind();
 		s_Data->shader->UploadUniformIntArray("u_Textures", samplers, s_Data->MaxTextureSlots);
 		delete[] quadIndices;
@@ -108,7 +112,8 @@ namespace Cyber {
 	void Renderer::BeginScene(Camera& camera) {
 		s_Data->shader->Bind();
 		s_Data->shader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-
+		for (uint32_t i = 1; i < s_Data->MaxTextureSlots; i++)
+			s_Data->TextureSlots[i] = nullptr;
 		StartBatch();
 	}
 	void Renderer::EndScene() {
@@ -129,7 +134,18 @@ namespace Cyber {
 			return;
 
 		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->QuadVertexBufferPtr - (uint8_t*)s_Data->QuadVertexBufferBase);
-		s_Data->vertexBuff->SetData(s_Data->QuadVertexBufferBase, dataSize);
+		delete s_Data->vertexBuff;
+		s_Data->vertexBuff = new VertexBuffer(s_Data->QuadVertexBufferBase, dataSize);
+		s_Data->vertexBuff->SetLayout({
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float4, "a_Color" },
+			{ ShaderDataType::Float2, "a_TexCoord" },
+			{ ShaderDataType::Float , "a_TexIndex" },
+			{ ShaderDataType::Float , "a_TilingFactor" },
+			{ ShaderDataType::Float , "a_Channels" },
+			{ ShaderDataType::Float , "a_ID"}
+			});
+		//s_Data->vertexBuff->SetData(s_Data->QuadVertexBufferBase, dataSize);
 
 		for (uint32_t i = 0; i < s_Data->TextureSlotIndex; i++)
 			s_Data->TextureSlots[i]->Bind(i);
@@ -179,7 +195,7 @@ namespace Cyber {
 	}
 
 	//Filled Transform
-	void Renderer::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int id)
 	{
 
 		constexpr size_t quadVertexCount = 4;
@@ -197,6 +213,7 @@ namespace Cyber {
 			s_Data->QuadVertexBufferPtr->TexIndex = 0;
 			s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;
 			s_Data->QuadVertexBufferPtr->Channels = 4;
+			s_Data->QuadVertexBufferPtr->id = id;
 			s_Data->QuadVertexBufferPtr++;
 		}
 
@@ -235,7 +252,7 @@ namespace Cyber {
 	}
 
 	//Texture transform
-	void Renderer::DrawQuad(const glm::mat4& transform, Texture* texture, float tilingFactor, const glm::vec4& tintColor)
+	void Renderer::DrawQuad(const glm::mat4& transform, Texture* texture, float tilingFactor, const glm::vec4& tintColor, int id)
 	{
 
 		constexpr size_t quadVertexCount = 4;
@@ -272,6 +289,7 @@ namespace Cyber {
 			s_Data->QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;
 			s_Data->QuadVertexBufferPtr->Channels = texture->GetChannels();
+			s_Data->QuadVertexBufferPtr->id = id;
 			s_Data->QuadVertexBufferPtr++;
 		}
 
@@ -292,12 +310,46 @@ namespace Cyber {
 	{
 		GL_CHECK(glViewport(0, 0, width, height));
 	}
-	void Renderer::DrawIndexed(VertexBuffer* vb, IndexBuffer* ib)
+	void Renderer::DrawIndexed(VertexBuffer* vb, IndexBuffer* ib, int mode)
 	{
 		vb->Bind(true);
 		ib->Bind();
 		uint32_t count = ib->GetCount();
-		GL_CHECK(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr));
+		GL_CHECK(glDrawElements(mode, count, GL_UNSIGNED_INT, nullptr));
 		GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
+	}
+	void Renderer::DrawLines(glm::vec3* points, int n, glm::vec4 color, float weight, bool loop)
+	{
+		Flush();
+		GL_CHECK(glLineWidth(weight));
+		uint32_t* indices = new uint32_t[n];
+		QuadVertex* verts = new QuadVertex[n];
+		for (size_t i = 0; i < n; i++)
+		{
+			indices[i] = i;
+			verts[i].Position = points[i];
+			verts[i].Color = color;
+			verts[i].TexCoord = { 0.5,0.5 };
+			verts[i].TexIndex = 0;
+			verts[i].TilingFactor = 1;
+			verts[i].Channels = 1;
+			verts[i].id = -1;
+
+		}
+		VertexBuffer vb = VertexBuffer(verts, n * sizeof(QuadVertex));
+		vb.SetLayout(s_Data->vertexBuff->GetLayout());
+		IndexBuffer ib = IndexBuffer(indices, n);
+		Renderer::DrawIndexed(&vb, &ib, loop ? GL_LINE_LOOP : GL_LINE_STRIP);
+		delete[]indices;
+		delete[]verts;
+		GL_CHECK(glLineWidth(1));
+		StartBatch();
+	}
+	void Renderer::BeginUI()
+	{
+		Flush();
+		//glClear(GL_DEPTH_BUFFER_BIT);
+		StartBatch();
+		glDisable(GL_DEPTH_TEST);
 	}
 }
