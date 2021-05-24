@@ -7,9 +7,9 @@ namespace Cyber {
 	{
 	public:
 		Editor(int argc, char** argv)
-			: Application(argc, argv) {
-			name = "Cyber Editor";
-			CB_INFO("STARTING EDITOR");
+			:Application(argc, argv, "Cyber Editor")
+		{
+			CB_CORE_INFO("STARTING EDITOR");
 			pushLayer(new EditorLayer());
 		}
 		~Editor() {

@@ -8,7 +8,7 @@ namespace Cyber {
 	class LayerStack;
 	class Application {
 	public:
-		Application(int argc, char** argv);
+		Application(int argc, char** argv, const std::string& name);
 		virtual ~Application();
 		virtual void Run();
 		std::string name;

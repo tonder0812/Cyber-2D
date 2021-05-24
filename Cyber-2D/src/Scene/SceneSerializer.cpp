@@ -87,17 +87,22 @@ namespace Cyber {
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
 		out << YAML::BeginMap; // Entity
-		out << YAML::Key << "Entity" << YAML::Value << "12837192831273"; // TODO: Entity ID goes here
+		out << YAML::Key << "Entity"; // TODO: Entity ID goes here
 
 		if (entity.HasComponent<TagComponent>())
 		{
+			auto& tagComponent = entity.GetComponent<TagComponent>();
+			out << YAML::Value << tagComponent.Id;
+
 			out << YAML::Key << "TagComponent";
 			out << YAML::BeginMap; // TagComponent
 
-			auto& tag = entity.GetComponent<TagComponent>().Tag;
-			out << YAML::Key << "Tag" << YAML::Value << tag;
+			out << YAML::Key << "Class" << YAML::Value << tagComponent.Class;
 
 			out << YAML::EndMap; // TagComponent
+		}
+		else {
+			out << YAML::Value << "";
 		}
 
 
@@ -208,16 +213,16 @@ namespace Cyber {
 		{
 			for (auto entity : entities)
 			{
-				uint64_t uuid = entity["Entity"].as<uint64_t>(); // TODO
+				std::string id = entity["Entity"].as<std::string>();
 
-				std::string name;
+				std::string Class;
 				auto tagComponent = entity["TagComponent"];
 				if (tagComponent)
-					name = tagComponent["Tag"].as<std::string>();
+					Class = tagComponent["Class"].as<std::string>();
 
-				CB_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
+				CB_CORE_TRACE("Deserialized entity with ID = {0}, Class = {1}", id, Class);
 
-				Entity deserializedEntity = m_Scene.CreateEntity(name);
+				Entity deserializedEntity = m_Scene.CreateEntity(id, Class);
 
 				auto orderComponent = entity["OrderComponent"];
 				if (orderComponent)

@@ -141,7 +141,8 @@ project "Sandbox"
 	{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.c",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/resources.rc"
 	}
 
 	includedirs
@@ -160,6 +161,11 @@ project "Sandbox"
 	{
 		"Cyber-2D",
 		"packages/python.3.9.4/tools/libs/python39.lib"
+	}
+
+  postbuildcommands {
+		"{COPYFILE} ../packages/python.3.9.4/tools/python39.dll %{cfg.targetdir}",
+		"{COPYDIR} assets %{cfg.targetdir}/assets"
 	}
 
 	filter "system:windows"
@@ -194,7 +200,8 @@ project "Cyber-Editor"
 	{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.c",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/resources.rc"
 	}
 
 	includedirs

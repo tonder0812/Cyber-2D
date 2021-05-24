@@ -16,12 +16,15 @@ namespace Cyber {
 
 	struct TagComponent
 	{
-		std::string Tag;
+		std::string Id;
+		std::string Class;
 
 		TagComponent() = default;
 		TagComponent(const TagComponent&) = default;
-		TagComponent(const std::string& tag)
-			: Tag(tag) {}
+		TagComponent(const std::string& id)
+			: Id(id) {}
+		TagComponent(const std::string& id, const std::string& _Class)
+			: Id(id),Class(_Class) {}
 	};
 
 	struct OrderComponent

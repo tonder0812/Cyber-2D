@@ -1,0 +1,85 @@
+Scene: Untitled
+Entities:
+  - Entity: Background 3
+    TagComponent:
+      Class: ""
+    OrderComponent:
+      Order: 5
+    TransformComponent:
+      Translation: [17, 0, 0]
+      Rotation: 0
+      Scale: [15, 20, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\background-day.png
+  - Entity: Background 2
+    TagComponent:
+      Class: ""
+    OrderComponent:
+      Order: 4
+    TransformComponent:
+      Translation: [2, 0, 0]
+      Rotation: 0
+      Scale: [15, 20, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\background-day.png
+  - Entity: Main Camera
+    TagComponent:
+      Class: Camera
+    OrderComponent:
+      Order: 1
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: 0
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        Size: 20
+        Near: -1
+        Far: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: Bird
+    TagComponent:
+      Class: ""
+    OrderComponent:
+      Order: 2
+    TransformComponent:
+      Translation: [-10, 0, 0.100000001]
+      Rotation: 0
+      Scale: [1.5, 1.25, 1]
+    SpriteRendererComponent:
+      Color: [0.999991417, 1, 0.999989986, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\bluebird-upflap.png
+    ScriptComponent:
+      Name: flappy
+  - Entity: Background 1
+    TagComponent:
+      Class: ""
+    OrderComponent:
+      Order: 3
+    TransformComponent:
+      Translation: [-13, 0, 0]
+      Rotation: 0
+      Scale: [15, 20, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\background-day.png
+  - Entity: Floor
+    TagComponent:
+      Class: ""
+    OrderComponent:
+      Order: 6
+    TransformComponent:
+      Translation: [0, -8.5, 1]
+      Rotation: 0
+      Scale: [50, 3, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\base.png

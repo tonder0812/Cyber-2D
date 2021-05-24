@@ -158,8 +158,8 @@ static const std::unordered_map<std::string, int>s_MouseCodes = {
 	{"7"     ,6},
 	{"8"     ,7},
 	{"LEFT"  ,0},
-	{"RIGHT" ,0},
-	{"MIDDLE",0}
+	{"RIGHT" ,1},
+	{"MIDDLE",2}
 };
 
 PyObject* InputTypeGetMouseX() {

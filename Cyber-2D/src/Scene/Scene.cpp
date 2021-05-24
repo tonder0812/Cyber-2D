@@ -31,7 +31,7 @@ namespace Cyber {
 	Scene::Scene(bool empty)
 	{
 		if (!empty) {
-			Entity MainCamera = CreateEntity("Main Camera");
+			Entity MainCamera = CreateEntity("Main Camera","Camera");
 			MainCamera.AddComponent<CameraComponent>();
 		}
 	}
@@ -45,12 +45,17 @@ namespace Cyber {
 			});
 	}
 
-	Entity Scene::CreateEntity(const std::string& name)
+	Entity Scene::CreateEntity(const std::string& id)
+	{
+		return CreateEntity(id, "");
+	}
+	Entity Scene::CreateEntity(const std::string& id, const std::string& Class)
 	{
 		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<TransformComponent>();
 		auto& tag = entity.AddComponent<TagComponent>();
-		tag.Tag = name.empty() ? "Entity" : name;
+		tag.Id = id.empty() ? "Entity" : id;
+		tag.Class = Class;
 		entity.AddComponent<OrderComponent>(++m_Nentities);
 		return entity;
 	}

@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "Window.h"
+#include "stb_image.h"
 #include <GLFW/glfw3.h>
+#include "Application.h"
+
 
 
 namespace Cyber {
@@ -68,6 +71,10 @@ namespace Cyber {
 				glfwIconifyWindow(m_Window);
 			}
 		}
+		GLFWimage images[1];
+		images[0].pixels = stbi_load((Application::Get().getPath().string() + "/assets/textures/cyber.png").c_str(), &images[0].width, &images[0].height, 0, 4); //rgba channels 
+		glfwSetWindowIcon(m_Window, 1, images);
+		stbi_image_free(images[0].pixels);
 		++s_WindowCount;
 
 		m_Context = std::make_unique<OpenGLContext>(OpenGLContext(m_Window));

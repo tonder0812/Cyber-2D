@@ -8,10 +8,8 @@ class Sandbox : public Cyber::Application
 {
 public:
 	Sandbox(int argc, char** argv) :
-		Application(argc, argv) {
-		//Application();
-		name = "Sandbox";
-		CB_INFO("STARTING SANDBOX");
+		Application(argc, argv, "Cyber Engine") {
+		CB_CORE_INFO("STARTING SANDBOX");
 		//pushLayer(new DemoLayer());
 		pushLayer(new Cyber::StandAloneLayer());
 	}

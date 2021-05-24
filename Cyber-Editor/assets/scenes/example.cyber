@@ -1,8 +1,8 @@
 Scene: Untitled
 Entities:
-  - Entity: 12837192831273
+  - Entity: Main Camera
     TagComponent:
-      Tag: Main Camera
+      Class: Camera
     OrderComponent:
       Order: 1
     TransformComponent:
@@ -16,9 +16,9 @@ Entities:
         Far: 1
       Primary: true
       FixedAspectRatio: false
-  - Entity: 12837192831273
+  - Entity: Square
     TagComponent:
-      Tag: Square
+      Class: ""
     OrderComponent:
       Order: 2
     TransformComponent:
@@ -31,9 +31,9 @@ Entities:
       Texture: ""
     ScriptComponent:
       Name: mover
-  - Entity: 12837192831273
+  - Entity: CIC
     TagComponent:
-      Tag: CIC
+      Class: ""
     OrderComponent:
       Order: 3
     TransformComponent:

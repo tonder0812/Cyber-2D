@@ -49,7 +49,6 @@ void main()
 {
 	vec4 texColor;
 	switch(int(v_TexIndex))
-	//switch(int(0))
 	{
 		case  0: texColor = texture(u_Textures[ 0], v_TexCoord * v_TilingFactor); break;
 		case  1: texColor = texture(u_Textures[ 1], v_TexCoord * v_TilingFactor); break;

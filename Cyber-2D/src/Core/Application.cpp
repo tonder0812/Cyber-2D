@@ -15,15 +15,13 @@ namespace Cyber {
 	bool mousePressed = false;
 
 	Application* Application::s_Instance = nullptr;
-	Application::Application(int argc, char** argv) {
-		if (s_Instance != nullptr)
-		{
-			CB_CORE_CRITICAL("Aplication Already Open");
-		}
-
+	Application::Application(int argc, char** argv, const std::string& name) {
+		CB_CORE_ASSERT(!s_Instance, "Aplication Already Open");
+		this->name = name;
 		//Get cwd
 		m_CWD = std::filesystem::current_path();
 		CB_CORE_INFO(m_CWD.string());
+
 		//decode argv
 		wchar_t** _argv = new wchar_t* [argc];
 		for (int i = 0; i < argc; i++) {
@@ -31,6 +29,7 @@ namespace Cyber {
 			m_args.emplace_back(argv[i]);
 			CB_CORE_TRACE(argv[i]);
 		}
+
 		//set path
 		std::filesystem::path exePath = m_args[0];
 		m_Path = exePath.parent_path();
@@ -62,6 +61,7 @@ namespace Cyber {
 		//add assets/scripts to search path
 		PyObject* sysPath = PySys_GetObject("path");
 		PyList_Append(sysPath, PyUnicode_FromString("./assets/scripts"));
+
 		//save PyGLM and Cyber to save on importing it every time
 		m_PyGLM = PyImport_ImportModule("glm");
 		m_PyGLM_Vec2 = PythonUtils::GetFuncFromModule(m_PyGLM, "vec2");
@@ -75,7 +75,7 @@ namespace Cyber {
 
 		s_Instance = this;
 		m_LayerStack = new LayerStack();
-		m_Window = new Window(WindowProps(1900, 980, "TEST", true, m_Minimized));
+		m_Window = new Window(WindowProps(1900, 980, name, true, m_Minimized));
 		//m_Window = new Window(WindowProps("TEST",m_Minimized));
 		m_Window->SetEventCallback([this](const Event* e) {
 			//CB_CORE_TRACE(*e);

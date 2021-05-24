@@ -109,7 +109,7 @@ namespace Cyber {
 		ImGui::Text("Mouse blocked: %d", Input::IsMouseBlocked());
 		ImGui::Text("Keyboard blocked: %d", Input::IsKeyboardBlocked());
 		ImGui::Text("Hovered id: %d", m_HoveredEntity ? m_HoveredEntity : -1);
-		ImGui::Text("Hovered entity: %s", m_HoveredEntity ? (m_HoveredEntity.GetComponent<TagComponent>().Tag.c_str()) : "");
+		ImGui::Text("Hovered entity: %s", m_HoveredEntity ? (m_HoveredEntity.GetComponent<TagComponent>().Id.c_str()) : "");
 		ImGui::End();
 #endif
 

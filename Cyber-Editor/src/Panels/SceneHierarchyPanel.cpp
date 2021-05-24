@@ -73,7 +73,7 @@ namespace Cyber {
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
-		auto& tag = entity.GetComponent<TagComponent>().Tag;
+		auto& ID = entity.GetComponent<TagComponent>().Id;
 		bool selected = false;
 		if (m_SelectionContext == entity) {
 			selected = true;
@@ -82,8 +82,8 @@ namespace Cyber {
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
 		}
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, { 0,0.5 });
-		ImGui::PushID((void*)&tag);
-		if (ImGui::Button(tag.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), 0.0f)))
+		ImGui::PushID((void*)&ID);
+		if (ImGui::Button(ID.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), 0.0f)))
 		{
 			m_SelectionContext = entity;
 		}
@@ -193,14 +193,16 @@ namespace Cyber {
 		ImGui::PopID();
 	}
 
-	static void DrawFloatControl(const std::string& label, const std::string& btnLabel, float& value, float resetValue = 0.0f, bool expandAll = false)
+	static void DrawFloatControl(const std::string& label, const std::string& btnLabel, float& value, float resetValue = 0.0f, bool expandAll = false, float width = 100)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[0];
 
 		ImGui::PushID(label.c_str());
 		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, 100.0f);
+
+
+		ImGui::SetColumnWidth(0, width);
 		ImGui::Text(label.c_str());
 		ImGui::NextColumn();
 		if (!expandAll) {
@@ -282,22 +284,48 @@ namespace Cyber {
 	{
 		if (entity.HasComponent<TagComponent>())
 		{
-			auto& tag = entity.GetComponent<TagComponent>().Tag;
+			auto& tagComponent = entity.GetComponent<TagComponent>();
+
+			ImGuiStyle& style = ImGui::GetStyle();
+			float width = ImGui::CalcTextSize("Class").x + style.ItemSpacing.x * 2;
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
-			std::strncpy(buffer, tag.c_str(), sizeof(buffer));
-			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
+			std::strncpy(buffer, tagComponent.Id.c_str(), sizeof(buffer));
+
+			ImGui::Columns(2);
+			ImGui::SetColumnWidth(0, width);
+			ImGui::Text("ID");
+			ImGui::NextColumn();
+
+			if (ImGui::InputText("##ID", buffer, sizeof(buffer)))
 			{
-				tag = std::string(buffer);
+				tagComponent.Id = std::string(buffer);
 			}
+			ImGui::SameLine();
+			ImGui::PushItemWidth(-1);
+
+			if (ImGui::Button("Add Component"))
+				ImGui::OpenPopup("AddComponent");
+			ImGui::Columns(1);
+
+			char buffer2[256];
+			memset(buffer2, 0, sizeof(buffer2));
+			std::strncpy(buffer2, tagComponent.Class.c_str(), sizeof(buffer2));
+
+			ImGui::Columns(2);
+			ImGui::SetColumnWidth(0, width);
+			ImGui::Text("Class");
+			ImGui::NextColumn();
+			if (ImGui::InputText("##Class", buffer2, sizeof(buffer2)))
+			{
+				tagComponent.Class = std::string(buffer2);
+			}
+			ImGui::Columns(1);
+
 		}
 
-		ImGui::SameLine();
-		ImGui::PushItemWidth(-1);
 
-		if (ImGui::Button("Add Component"))
-			ImGui::OpenPopup("AddComponent");
 
 		if (ImGui::BeginPopup("AddComponent"))
 		{
@@ -340,11 +368,15 @@ namespace Cyber {
 
 		DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
 			{
-				DrawVec3Control("Translation", component.Transform->Translation->super_type);
+				ImGuiStyle& style = ImGui::GetStyle();
+				float width = ImGui::CalcTextSize("Translation").x + style.ItemSpacing.x * 3;
+				if (width < 100)
+					width = 100;
+				DrawVec3Control("Translation", component.Transform->Translation->super_type, 0, width);
 				float rotation = glm::degrees(component.Transform->Rotation);
-				DrawFloatControl("Rotation", "R", rotation);
+				DrawFloatControl("Rotation", "R", rotation, 0, false, width);
 				component.Transform->Rotation = glm::radians(rotation);
-				DrawVec3Control("Scale", component.Transform->Scale->super_type, 1.0f);
+				DrawVec3Control("Scale", component.Transform->Scale->super_type, 1.0f, width);
 			}, false);
 
 		DrawComponent<CameraComponent>("Camera", entity, [&](CameraComponent& component)
@@ -357,15 +389,20 @@ namespace Cyber {
 
 
 				float Size = camera.GetSize();
-				DrawFloatControl("Size", "S", Size, 10, true);
+
+				ImGuiStyle& style = ImGui::GetStyle();
+				float width = ImGui::CalcTextSize("Size").x + style.ItemSpacing.x * 3;
+				if (width < 100)
+					width = 100;
+				DrawFloatControl("Size", "S", Size, 10, true, width);
 				camera.SetSize(Size);
 
 				float Near = camera.GetNearClip();
-				DrawFloatControl("Near", "N", Near, -1, true);
+				DrawFloatControl("Near", "N", Near, -1, true, width);
 				camera.SetNearClip(Near);
 
 				float Far = camera.GetFarClip();
-				DrawFloatControl("Far", "F", Far, 1, true);
+				DrawFloatControl("Far", "F", Far, 1, true, width);
 				camera.SetFarClip(Far);
 
 				/*if (ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio))

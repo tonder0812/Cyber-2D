@@ -30,8 +30,11 @@ namespace Cyber {
 	}
 
 	void ScriptComponent::Destroy() {
-		if (initialized && onDestroy)
+		if (initialized && onDestroy) {
 			PyObject_CallObject(onDestroy, NULL);
+			if (PyErr_Occurred())
+				CB_ERROR(PythonUtils::GetErrorMessage());
+		}
 		Py_XDECREF(onStart);
 		Py_XDECREF(onUpdate);
 		Py_XDECREF(onDestroy);

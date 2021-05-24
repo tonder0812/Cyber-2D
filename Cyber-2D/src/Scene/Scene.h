@@ -14,7 +14,8 @@ namespace Cyber {
 		Scene(bool empty = false);
 		~Scene();
 
-		Entity CreateEntity(const std::string& name = std::string());
+		Entity CreateEntity(const std::string& id = std::string());
+		Entity CreateEntity(const std::string& id, const std::string& Class);
 		void DestroyEntity(Entity entity);
 
 		void OnUpdateEditor(float ts, EditorCamera& editorCamera, std::shared_ptr<Texture> cameraTexture);

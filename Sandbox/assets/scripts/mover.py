@@ -1,5 +1,6 @@
 ﻿import Cyber
 import glm
+import random
 speed=6
 def Start():
 	Cyber.Log.Error("Error")
@@ -28,6 +29,7 @@ def Update(ts,transform):
 		transform.Translation=glm.vec3()
 		transform.Rotation=0
 	
+	transform.Scale.x = random.random() * 100
 
 def Event(e):
 	pass
