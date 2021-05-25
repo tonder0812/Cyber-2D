@@ -3,11 +3,12 @@ import glm
 
 speed=6
 jumped=False
+playing=False
 def Start():
 	pass
 
-def Update(ts,transform):
-	global speed,jumped
+def UpdatePlay(ts):
+	global speed,jumped,this
 	if(Cyber.Input.IsKeyPressed(" ") and not jumped):
 		speed=-6
 		jumped=True
@@ -16,10 +17,16 @@ def Update(ts,transform):
 	speed+=0.1
 	if(speed>6):
 		speed=6
-	transform.Translation.y-=speed*ts
-	
+	this.GetTransform().Translation.y-=speed*ts
+
+def Update(ts):
+	global speed,jumped,playing,this
+	if(playing):
+		UpdatePlay(ts)
+	elif(Cyber.Input.IsKeyPressed(" ")):
+		playing=True
 def Event(e):
 	pass
 
 def Destroy():
-	Cyber.Log.Info("Destroy")
+	pass

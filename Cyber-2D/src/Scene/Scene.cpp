@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "Components.h"
 #include "Python/Utils.h"
+#include "Python/PyEntity.h"
 #include "Utils/Utils.h"
 #include "OpenGL/OpenGLRenderer.h"
 #include <Imgui.h>
@@ -31,7 +32,7 @@ namespace Cyber {
 	Scene::Scene(bool empty)
 	{
 		if (!empty) {
-			Entity MainCamera = CreateEntity("Main Camera","Camera");
+			Entity MainCamera = CreateEntity("Main Camera", "Camera");
 			MainCamera.AddComponent<CameraComponent>();
 		}
 	}
@@ -107,6 +108,12 @@ namespace Cyber {
 			auto& script = ScriptView.get<ScriptComponent>(et);
 			if (!script.initialized) {
 				script.initialized = true;
+
+				PyObject* pEntityType = Application::Get().GetPyCyber_Entity();
+				EntityObject* entity = (EntityObject*)PyObject_CallObject(pEntityType, NULL);
+				entity->m_Entity = Entity(et, this);
+				PyModule_AddObject(script.pModule, "this", (PyObject*)entity);
+
 				if (script.onStart) {
 					PyObject_CallObject(script.onStart, NULL);
 					if (PyErr_Occurred())
@@ -115,13 +122,9 @@ namespace Cyber {
 			}
 			if (script.onUpdate) {
 				PyObject* pArgs, * pValue;
-				pArgs = PyTuple_New(2);
+				pArgs = PyTuple_New(1);
 				pValue = PyFloat_FromDouble(ts);
 				PyTuple_SetItem(pArgs, 0, pValue);
-
-				PyObject* transform = (PyObject*)Entity(et, this).GetComponent<TransformComponent>().Transform;
-				Py_INCREF(transform);
-				PyTuple_SetItem(pArgs, 1, transform);
 
 				PyObject_CallObject(script.onUpdate, pArgs);
 				if (PyErr_Occurred())

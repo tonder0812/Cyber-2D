@@ -70,6 +70,7 @@ namespace Cyber {
 		m_PyGLM_Mat4 = PythonUtils::GetFuncFromModule(m_PyGLM, "mat4");
 
 		m_PyCyber = PyImport_ImportModule("Cyber");
+		m_PyCyber_Entity = PythonUtils::GetFuncFromModule(m_PyCyber, "Entity");
 		m_PyCyber_Transform = PythonUtils::GetFuncFromModule(m_PyCyber, "TransformComponent");
 
 

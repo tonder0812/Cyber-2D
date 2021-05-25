@@ -24,7 +24,7 @@ namespace Cyber {
 		TagComponent(const std::string& id)
 			: Id(id) {}
 		TagComponent(const std::string& id, const std::string& _Class)
-			: Id(id),Class(_Class) {}
+			: Id(id), Class(_Class) {}
 	};
 
 	struct OrderComponent
@@ -104,7 +104,7 @@ namespace Cyber {
 	{
 		std::string name;
 		bool initialized = false;
-		PyObject* onUpdate = nullptr, * onStart = nullptr, * onDestroy = nullptr;
+		PyObject* onUpdate = nullptr, * onStart = nullptr, * onDestroy = nullptr, * pModule = nullptr;
 		ScriptComponent() = default;
 		ScriptComponent(const std::string& name);
 		void Initialize();

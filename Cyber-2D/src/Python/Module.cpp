@@ -2,7 +2,9 @@
 #include "Python/Python.h"
 #include "Python/PyInput.h"
 #include "Python/PyComponents.h"
+#include "Python/PyEntity.h"
 #include "Python/PyLog.h"
+#include "Utils.h"
 
 PyModuleDef CyberModule = {
 	PyModuleDef_HEAD_INIT,
@@ -23,6 +25,7 @@ extern "C" {
 
 		if (PyType_Ready(&InputType) < 0) return NULL;
 		if (PyType_Ready(&LogType) < 0) return NULL;
+		if (PyType_Ready(&EntityType) < 0) return NULL;
 		if (PyType_Ready(&TransformComponentType) < 0) return NULL;
 
 
@@ -36,6 +39,7 @@ extern "C" {
 			Py_DECREF(m);
 			return NULL;
 		}
+
 		Py_INCREF(&LogType);
 		if (PyModule_AddObject(m, "Log", (PyObject*)&LogType) < 0) {
 			Py_DECREF(&LogType);
@@ -43,11 +47,20 @@ extern "C" {
 			Py_DECREF(m);
 			return NULL;
 		}
-		Py_INCREF(&TransformComponentType);
-		if (PyModule_AddObject(m, "TransformComponent", (PyObject*)&TransformComponentType) < 0) {
-			Py_DECREF(&TransformComponentType);
+		Py_INCREF(&EntityType);
+		if (PyModule_AddObject(m, "Entity", (PyObject*)&EntityType) < 0) {
 			Py_DECREF(&LogType);
 			Py_DECREF(&InputType);
+			Py_DECREF(&EntityType);
+			Py_DECREF(m);
+			return NULL;
+		}
+		Py_INCREF(&TransformComponentType);
+		if (PyModule_AddObject(m, "TransformComponent", (PyObject*)&TransformComponentType) < 0) {
+			Py_DECREF(&LogType);
+			Py_DECREF(&InputType);
+			Py_DECREF(&EntityType);
+			Py_DECREF(&TransformComponentType);
 			Py_DECREF(m);
 			return NULL;
 		}
