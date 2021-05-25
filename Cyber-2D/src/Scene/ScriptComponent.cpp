@@ -10,15 +10,20 @@ namespace Cyber {
 
 	void ScriptComponent::Initialize() {
 		m_name = name;
-		initialized = false;
-		pModule = PyImport_ImportModule(name.c_str());
-		onStart = nullptr;
-		onUpdate = nullptr;
-		onDestroy = nullptr;
-		if (pModule != NULL) {
-			onStart = PythonUtils::GetFuncFromModule(pModule, "Start");
-			onUpdate = PythonUtils::GetFuncFromModule(pModule, "Update");
-			onDestroy = PythonUtils::GetFuncFromModule(pModule, "Destroy");
+		Script = (ScriptComponentObject*)PyObject_CallObject(Application::Get().GetPyCyber_Script(), NULL);
+		if (PyErr_Occurred())
+			CB_CORE_ERROR(PythonUtils::GetErrorMessage());
+		CB_CORE_ASSERT(Script, "Error when initializing Transform");
+		Script->initialized = false;
+		Script->pModule = PyImport_ImportModule(name.c_str());
+		Script->onStart = nullptr;
+		Script->onUpdate = nullptr;
+		Script->onDestroy = nullptr;
+		if (Script->pModule != NULL) {
+			Script->onStart = PythonUtils::GetFuncFromModule(Script->pModule, "Start", true);
+			Script->onUpdate = PythonUtils::GetFuncFromModule(Script->pModule, "Update", true);
+			Script->onDestroy = PythonUtils::GetFuncFromModule(Script->pModule, "Destroy", true);
+			Script->exports = PythonUtils::GetVarFromModule(Script->pModule, "Exports", true);
 		}
 		else {
 			if (PyErr_Occurred())
@@ -28,15 +33,12 @@ namespace Cyber {
 	}
 
 	void ScriptComponent::Destroy() {
-		if (initialized && onDestroy) {
-			PyObject_CallObject(onDestroy, NULL);
+		if (Script->initialized && Script->onDestroy) {
+			PyObject_CallObject(Script->onDestroy, NULL);
 			if (PyErr_Occurred())
 				CB_ERROR(PythonUtils::GetErrorMessage());
 		}
-		Py_XDECREF(onStart);
-		Py_XDECREF(onUpdate);
-		Py_XDECREF(onDestroy);
-		Py_DECREF(pModule);
+		Py_DECREF(Script);
 		PyObject* key = PyUnicode_FromString(m_name.c_str());
 		PyDict_DelItem(PySys_GetObject("modules"), key);
 		Py_DECREF(key);

@@ -30,6 +30,7 @@ namespace Cyber {
 		PyObject* GetPyCyber() { return m_PyCyber; };
 		PyObject* GetPyCyber_Entity() { return m_PyCyber_Entity; };
 		PyObject* GetPyCyber_Transform() { return m_PyCyber_Transform; };
+		PyObject* GetPyCyber_Script() { return m_PyCyber_Script; };
 		std::filesystem::path getCWD() { return m_CWD; };
 		std::filesystem::path getPath() { return m_Path; };
 	private:
@@ -49,8 +50,9 @@ namespace Cyber {
 		PyObject* m_PyGLM_Vec4 = nullptr;
 		PyObject* m_PyGLM_Mat4 = nullptr;
 		PyObject* m_PyCyber = nullptr;
-		PyObject* m_PyCyber_Transform = nullptr;
 		PyObject* m_PyCyber_Entity = nullptr;
+		PyObject* m_PyCyber_Transform = nullptr;
+		PyObject* m_PyCyber_Script = nullptr;
 		std::filesystem::path m_CWD;
 		std::filesystem::path m_Path;
 	};

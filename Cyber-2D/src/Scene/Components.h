@@ -40,7 +40,7 @@ namespace Cyber {
 		TransformComponent() {
 			Transform = (TransformComponentObject*)PyObject_CallObject(Application::Get().GetPyCyber_Transform(), NULL);
 			if (PyErr_Occurred())
-				CB_CORE_ERROR(PythonUtils::GetErrorMessage());
+				CB_ERROR(PythonUtils::GetErrorMessage());
 			CB_CORE_ASSERT(Transform, "Error when initializing Transform");
 		}
 		void Destroy() {
@@ -103,8 +103,7 @@ namespace Cyber {
 	struct ScriptComponent
 	{
 		std::string name;
-		bool initialized = false;
-		PyObject* onUpdate = nullptr, * onStart = nullptr, * onDestroy = nullptr, * pModule = nullptr;
+		ScriptComponentObject* Script;
 		ScriptComponent() = default;
 		ScriptComponent(const std::string& name);
 		void Initialize();

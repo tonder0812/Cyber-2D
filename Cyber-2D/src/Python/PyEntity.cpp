@@ -4,7 +4,6 @@
 #include "Scene/Components.h"
 
 static int EntityTypeInit(EntityObject* self, PyObject* args, PyObject* kwds) {
-	CB_CORE_INFO("Entity init");
 	return 0;
 }
 
@@ -18,6 +17,17 @@ static PyObject* EntityTypeGetTransform(EntityObject* self, PyObject* args, PyOb
 		Cyber::TransformComponent& transform = self->m_Entity.GetComponent<Cyber::TransformComponent>();
 		Py_INCREF(transform.Transform);
 		return (PyObject*)transform.Transform;
+	}
+	else {
+		Py_RETURN_NONE;
+	}
+}
+
+static PyObject* EntityTypeGetScript(EntityObject* self, PyObject* args, PyObject* kwds) {
+	if (self->m_Entity.HasComponent<Cyber::ScriptComponent>()) {
+		Cyber::ScriptComponent& script = self->m_Entity.GetComponent<Cyber::ScriptComponent>();
+		Py_INCREF(script.Script);
+		return (PyObject*)script.Script;
 	}
 	else {
 		Py_RETURN_NONE;
@@ -57,6 +67,9 @@ static int EntityTypeClassSet(EntityObject* self, PyObject* value) {
 PyMethodDef EntityMethods[] = {
 	{"GetTransform", (PyCFunction)EntityTypeGetTransform, METH_NOARGS,
 	 "Return entities transform"
+	},
+	{"GetScript", (PyCFunction)EntityTypeGetScript, METH_NOARGS,
+	 "Return entities script"
 	},
 	{NULL}  /* Sentinel */
 };

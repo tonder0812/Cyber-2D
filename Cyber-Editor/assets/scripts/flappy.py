@@ -21,7 +21,6 @@ def UpdatePlay(ts):
 
 def Update(ts):
 	global speed,jumped,playing,this
-	Cyber.Log.Info(Cyber.Input.GetMousePosition())
 	if(playing):
 		UpdatePlay(ts)
 	elif(Cyber.Input.IsKeyPressed(" ")):

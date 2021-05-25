@@ -106,27 +106,27 @@ namespace Cyber {
 		for (auto et : ScriptView)
 		{
 			auto& script = ScriptView.get<ScriptComponent>(et);
-			if (!script.initialized) {
-				script.initialized = true;
+			if (!script.Script->initialized) {
+				script.Script->initialized = true;
 
 				PyObject* pEntityType = Application::Get().GetPyCyber_Entity();
 				EntityObject* entity = (EntityObject*)PyObject_CallObject(pEntityType, NULL);
 				entity->m_Entity = Entity(et, this);
-				PyModule_AddObject(script.pModule, "this", (PyObject*)entity);
+				PyModule_AddObject(script.Script->pModule, "this", (PyObject*)entity);
 
-				if (script.onStart) {
-					PyObject_CallObject(script.onStart, NULL);
+				if (script.Script->onStart) {
+					PyObject_CallObject(script.Script->onStart, NULL);
 					if (PyErr_Occurred())
 						CB_ERROR(PythonUtils::GetErrorMessage());
 				}
 			}
-			if (script.onUpdate) {
+			if (script.Script->onUpdate) {
 				PyObject* pArgs, * pValue;
 				pArgs = PyTuple_New(1);
 				pValue = PyFloat_FromDouble(ts);
 				PyTuple_SetItem(pArgs, 0, pValue);
 
-				PyObject_CallObject(script.onUpdate, pArgs);
+				PyObject_CallObject(script.Script->onUpdate, pArgs);
 				if (PyErr_Occurred())
 					CB_ERROR(PythonUtils::GetErrorMessage());
 				Py_DECREF(pArgs);

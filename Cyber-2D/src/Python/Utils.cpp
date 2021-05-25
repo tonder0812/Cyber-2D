@@ -4,16 +4,39 @@
 
 namespace Cyber::PythonUtils {
 
-	PyObject* GetFuncFromModule(PyObject* pModule, const char* name) {
+	PyObject* GetFuncFromModule(PyObject* pModule, const char* name, bool ignoreError) {
 		PyObject* pFunc = PyObject_GetAttrString(pModule, name);
 		if (pFunc && PyCallable_Check(pFunc)) {
 			return pFunc;
 		}
 
-		if (PyErr_Occurred())
-			CB_CORE_ERROR(PythonUtils::GetErrorMessage());
+		if (PyErr_Occurred()) {
+			if (ignoreError) {
+				PythonUtils::GetErrorMessage();
+			}else{
+				CB_ERROR(PythonUtils::GetErrorMessage());
+			}
+		}
 
 		CB_CORE_WARN("Cannot find function \"{0}\"", name);
+		return nullptr;
+	}
+	PyObject* GetVarFromModule(PyObject* pModule, const char* name, bool ignoreError) {
+		PyObject* pFunc = PyObject_GetAttrString(pModule, name);
+		if (pFunc) {
+			return pFunc;
+		}
+
+		if (PyErr_Occurred()) {
+			if (ignoreError) {
+				PythonUtils::GetErrorMessage();
+			}
+			else {
+				CB_ERROR(PythonUtils::GetErrorMessage());
+			}
+		}
+
+		CB_CORE_WARN("Cannot find variable \"{0}\"", name);
 		return nullptr;
 	}
 

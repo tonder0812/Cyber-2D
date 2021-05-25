@@ -27,6 +27,7 @@ extern "C" {
 		if (PyType_Ready(&LogType) < 0) return NULL;
 		if (PyType_Ready(&EntityType) < 0) return NULL;
 		if (PyType_Ready(&TransformComponentType) < 0) return NULL;
+		if (PyType_Ready(&ScriptComponentType) < 0) return NULL;
 
 
 		m = PyModule_Create(&CyberModule);
@@ -61,6 +62,16 @@ extern "C" {
 			Py_DECREF(&InputType);
 			Py_DECREF(&EntityType);
 			Py_DECREF(&TransformComponentType);
+			Py_DECREF(m);
+			return NULL;
+		}
+		Py_INCREF(&ScriptComponentType);
+		if (PyModule_AddObject(m, "ScriptComponent", (PyObject*)&ScriptComponentType) < 0) {
+			Py_DECREF(&LogType);
+			Py_DECREF(&InputType);
+			Py_DECREF(&EntityType);
+			Py_DECREF(&TransformComponentType);
+			Py_DECREF(&ScriptComponentType);
 			Py_DECREF(m);
 			return NULL;
 		}
