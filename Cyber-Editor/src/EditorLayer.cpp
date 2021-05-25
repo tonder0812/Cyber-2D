@@ -118,14 +118,31 @@ namespace Cyber {
 		Input::SetMouseBlocked(!ImGui::IsWindowHovered());
 		Input::SetKeyboardBlocked(!ImGui::IsWindowFocused());
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 		auto viewportOffset = ImGui::GetWindowPos();
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-		glm::vec4 bounds = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y , viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+		if (m_Runtime)
+		{
+			if (viewportPanelSize.x / 1.7777777 < viewportPanelSize.y) {
+				m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.x / 1.7777777 };
+			}
+			else {
+				m_ViewportSize = { viewportPanelSize.y * 1.7777777, viewportPanelSize.y };
+			}
+		}
+		else {
+			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+		}
+		ImVec2 cursor = { (viewportPanelSize.x - m_ViewportSize.x) * 0.5f, (viewportPanelSize.y - m_ViewportSize.y) * 0.5f + viewportMinRegion.y };
+		ImGui::SetCursorPos(cursor);
+		glm::vec4 bounds = {
+			 viewportOffset.x + cursor.x,
+			 viewportOffset.y + cursor.y,
+			 m_ViewportSize.x + cursor.x + viewportOffset.x,
+			 m_ViewportSize.y + cursor.y + viewportOffset.y
+		};
 		Input::SetBounds(bounds);
-		ImGui::Image((void*)m_Framebuffer->GetColorAttachmentRendererID(), viewportPanelSize, { 0, 1 }, { 1, 0 });
-
+		//CB_CORE_INFO("{0}:{1}", (viewportPanelSize.x - m_ViewportSize.x, (viewportPanelSize.y - viewportMinRegion.y - m_ViewportSize.y) / 2.0f + viewportMinRegion.y);
+		ImGui::Image((void*)m_Framebuffer->GetColorAttachmentRendererID(), *(ImVec2*)&m_ViewportSize, { 0, 1 }, { 1, 0 });
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 		if (selectedEntity && m_GizmoType != -1)
 		{

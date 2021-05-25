@@ -2,6 +2,7 @@
 #include "Cyber.h"
 #include <glm\glm.hpp>
 #include "Scene/Scene.h"
+#include "OpenGL/OpenGLFrameBuffer.h"
 
 
 namespace Cyber {
@@ -19,5 +20,6 @@ namespace Cyber {
 		glm::vec2 m_ViewportSize = { 0,0 };
 		bool m_ViewportSizeChanged = true;
 		Scene* m_CurrentScene = nullptr;
+		Framebuffer* m_Framebuffer = nullptr;
 	};
 }

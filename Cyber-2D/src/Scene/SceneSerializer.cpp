@@ -143,6 +143,7 @@ namespace Cyber {
 			out << YAML::Key << "Size" << YAML::Value << camera.GetSize();
 			out << YAML::Key << "Near" << YAML::Value << camera.GetNearClip();
 			out << YAML::Key << "Far" << YAML::Value << camera.GetFarClip();
+			out << YAML::Key << "AspectRatio" << YAML::Value << cameraComponent.Camera.GetAspectRatio();
 			out << YAML::EndMap; // Camera
 
 			out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
@@ -248,6 +249,7 @@ namespace Cyber {
 					cc.Camera.SetSize(cameraProps["Size"].as<float>());
 					cc.Camera.SetNearClip(cameraProps["Near"].as<float>());
 					cc.Camera.SetFarClip(cameraProps["Far"].as<float>());
+					cc.Camera.SetAspectRatio(cameraProps["AspectRatio"].as<float>());
 
 					cc.Primary = cameraComponent["Primary"].as<bool>();
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();

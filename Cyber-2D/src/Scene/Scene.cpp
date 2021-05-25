@@ -230,7 +230,9 @@ namespace Cyber {
 	template<>
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
 	{
-		component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		component.FixedAspectRatio = true;
+		//component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		component.Camera.SetAspectRatio(16 / 9.0f);
 	}
 
 	template<>

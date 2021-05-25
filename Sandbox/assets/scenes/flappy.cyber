@@ -40,8 +40,9 @@ Entities:
         Size: 20
         Near: -1
         Far: 1
+        AspectRatio: 1.777777777777
       Primary: true
-      FixedAspectRatio: false
+      FixedAspectRatio: true
   - Entity: Bird
     TagComponent:
       Class: ""
