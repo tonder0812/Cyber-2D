@@ -33,7 +33,7 @@ namespace Cyber {
 
 		float ZoomSpeed() const;
 	private:
-		float m_Size = 10.0f, m_AspectRatio = 1.778f, m_NearClip = -1.0f, m_FarClip = 1.0f;
+		float m_Size = 10.0f, m_AspectRatio = (16.0f / 9.0f), m_NearClip = -1.0f, m_FarClip = 1.0f;
 
 		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
 

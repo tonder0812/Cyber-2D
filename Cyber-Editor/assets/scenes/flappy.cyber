@@ -227,9 +227,9 @@ Entities:
         Size: 20
         Near: -1
         Far: 1
-        AspectRatio: 1.77777779
+        AspectRatio: 1.77915192
       Primary: true
-      FixedAspectRatio: true
+      FixedAspectRatio: false
   - Entity: Background 2
     TagComponent:
       Class: ""

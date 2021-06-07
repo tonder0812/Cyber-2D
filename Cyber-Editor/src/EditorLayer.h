@@ -12,7 +12,7 @@ namespace Cyber {
 	class EditorLayer : public Layer {
 	public:
 		EditorLayer() :
-			Layer("Editor Layer"), m_EditorCamera(EditorCamera(15.0f, 1.778f, -10000.0f, 10000.0f)){
+			Layer("Editor Layer"), m_EditorCamera(EditorCamera(15.0f, (16.0f / 9.0f), -10000.0f, 10000.0f)){
 		};
 		void onAttach() override;
 		void onDetach() override;

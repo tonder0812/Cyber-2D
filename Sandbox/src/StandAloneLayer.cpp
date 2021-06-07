@@ -39,11 +39,11 @@ namespace Cyber {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin("GameViewport", &True, ImGuiWindowFlags_NoDecoration);
 		ImGui::PopStyleVar(3);
-		if (viewport->Size.x / 1.7777777 < viewport->Size.y) {
-			m_ViewportSize = { viewport->Size.x, viewport->Size.x / 1.7777777 };
+		if (viewport->Size.x / (16.0f / 9.0f) < viewport->Size.y) {
+			m_ViewportSize = { viewport->Size.x, viewport->Size.x / (16.0f / 9.0f) };
 		}
 		else {
-			m_ViewportSize = { viewport->Size.y * 1.7777777, viewport->Size.y };
+			m_ViewportSize = { viewport->Size.y * (16.0f / 9.0f), viewport->Size.y };
 		}
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		ImVec2 cursor = {

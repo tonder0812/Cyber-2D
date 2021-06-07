@@ -120,11 +120,11 @@ namespace Cyber {
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 		auto viewportOffset = ImGui::GetWindowPos();
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-		if (viewportPanelSize.x / 1.7777777 < viewportPanelSize.y) {
-			m_ViewportSizeScene = { viewportPanelSize.x, viewportPanelSize.x / 1.7777777 };
+		if (viewportPanelSize.x / (16.0f/9.0f) < viewportPanelSize.y) {
+			m_ViewportSizeScene = { viewportPanelSize.x, viewportPanelSize.x / (16.0f / 9.0f) };
 		}
 		else {
-			m_ViewportSizeScene = { viewportPanelSize.y * 1.7777777, viewportPanelSize.y };
+			m_ViewportSizeScene = { viewportPanelSize.y * (16.0f / 9.0f), viewportPanelSize.y };
 		}
 		if (m_Runtime)
 		{

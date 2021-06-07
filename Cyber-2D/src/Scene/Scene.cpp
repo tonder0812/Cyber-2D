@@ -13,20 +13,22 @@
 
 namespace Cyber {
 	Scene* Scene::CurrentScene = nullptr;
-	static void rotate(glm::vec3 a[], int n, float x_pivot, float y_pivot,
+	static void rotate(glm::vec3 points[], int n, float x_pivot, float y_pivot,
 		float angle)
 	{
-		int i = 0;
-		while (i < n) {
-			int x_shifted = a[i].x - x_pivot;
-			int y_shifted = a[i].y - y_pivot;
-			a[i].x = x_pivot
-				+ (x_shifted * glm::cos(angle)
-					- y_shifted * glm::sin(angle));
-			a[i].y = y_pivot
-				+ (x_shifted * glm::sin(angle)
-					+ y_shifted * glm::cos(angle));
-			i++;
+		for (int i = 0; i < n; i++) {
+
+			float x_shifted = points[i].x - x_pivot;
+			float y_shifted = points[i].y - y_pivot;
+			
+			points[i].x =
+				x_pivot
+				+ x_shifted * glm::cos(angle)
+				- y_shifted * glm::sin(angle);
+
+			points[i].y = y_pivot
+				+ x_shifted * glm::sin(angle)
+				+ y_shifted * glm::cos(angle);
 		}
 	}
 
@@ -34,7 +36,7 @@ namespace Cyber {
 	{
 		if (!empty) {
 			Entity MainCamera = CreateEntity("Main Camera", "Camera");
-			CameraComponent& camera=MainCamera.AddComponent<CameraComponent>();
+			CameraComponent& camera = MainCamera.AddComponent<CameraComponent>();
 			camera.Camera->Primary = true;
 		}
 	}
@@ -145,7 +147,7 @@ namespace Cyber {
 		Entity cameraEntity = GetPrimaryCameraEntity();
 		if (cameraEntity) {
 			glm::vec2 point = Input::GetMousePositionViewport();
-			
+
 			Renderer::BeginScene(Camera{ cameraEntity.GetComponent<CameraComponent>().Camera->Camera.GetProjection() , glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform()) });
 			RenderSprites();
 			Renderer::EndScene();
