@@ -6,7 +6,7 @@
 #include "PyGLM/types/types.h"
 #include "glm/glm.hpp"
 
-PyObject* InputTypeGetMousePosition() {
+static PyObject* InputTypeGetMousePosition() {
 	vec<2, float>* pos = (vec<2, float> *)PyObject_CallObject(Cyber::Application::Get().GetPyGLM_Vec2(), NULL);
 	pos->super_type = Cyber::Input::GetMousePositionViewport();
 	return (PyObject*)pos;
@@ -162,21 +162,20 @@ static const std::unordered_map<std::string, int>s_MouseCodes = {
 	{"MIDDLE",2}
 };
 
-PyObject* InputTypeGetMouseX() {
+static PyObject* InputTypeGetMouseX() {
 	return PyFloat_FromDouble(Cyber::Input::GetMouseXViewport());
 }
 
-PyObject* InputTypeGetMouseY() {
+static PyObject* InputTypeGetMouseY() {
 	return PyFloat_FromDouble(Cyber::Input::GetMouseYViewport());
 }
-PyObject* InputTypeIsKeyPressed(PyObject* self, PyObject* args) {
+
+static PyObject* InputTypeIsKeyPressed(PyObject* self, PyObject* args) {
 	const char* str;
 	if (!PyArg_ParseTuple(args, "s", &str)) {
-		Py_DECREF(args);
 		return NULL;
 	}
 	auto tmp = s_KeyCodes.find(str);
-	Py_DECREF(args);
 	if (tmp == s_KeyCodes.end())
 		Py_RETURN_FALSE;
 
@@ -187,14 +186,12 @@ PyObject* InputTypeIsKeyPressed(PyObject* self, PyObject* args) {
 		Py_RETURN_FALSE;
 	}
 }
-PyObject* InputTypeIsMouseButtonPressed(PyObject* self, PyObject* args) {
+static PyObject* InputTypeIsMouseButtonPressed(PyObject* self, PyObject* args) {
 	const char* str;
 	if (!PyArg_ParseTuple(args, "s", &str)) {
-		Py_DECREF(args);
 		return NULL;
 	}
 	auto tmp = s_MouseCodes.find(str);
-	Py_DECREF(args);
 	if (tmp == s_KeyCodes.end())
 		Py_RETURN_FALSE;
 
@@ -207,7 +204,7 @@ PyObject* InputTypeIsMouseButtonPressed(PyObject* self, PyObject* args) {
 }
 
 
-PyMethodDef InputMethods[] = {
+static PyMethodDef InputMethods[] = {
 	{"GetMousePosition", (PyCFunction)InputTypeGetMousePosition, METH_STATIC | METH_NOARGS,
 	 "Return a glm.vec2 with the mouse position relative to viewport with 0,0 at the top left"
 	},

@@ -23,26 +23,31 @@ namespace Cyber {
 			Script->onStart = PythonUtils::GetFuncFromModule(Script->pModule, "Start", true);
 			Script->onUpdate = PythonUtils::GetFuncFromModule(Script->pModule, "Update", true);
 			Script->onDestroy = PythonUtils::GetFuncFromModule(Script->pModule, "Destroy", true);
-			Script->exports = PythonUtils::GetVarFromModule(Script->pModule, "Exports", true);
+			Script->Public = PythonUtils::GetVarFromModule(Script->pModule, "Public", true);
+			PyObject* key = PyUnicode_FromString(m_name.c_str());
+			PyDict_DelItem(PySys_GetObject("modules"), key);
+			Py_DECREF(key);
+			if (PyErr_Occurred())
+				PythonUtils::GetErrorMessage();
 		}
 		else {
 			if (PyErr_Occurred())
 				CB_ERROR(PythonUtils::GetErrorMessage());
-			CB_ERROR("Failed to load \"{0}\"", name.c_str());
+			//CB_ERROR("Failed to load \"{0}\"", name.c_str());
+			Py_DECREF(Script);
+			Script = nullptr;
 		}
 	}
 
 	void ScriptComponent::Destroy() {
+		if (!Script) {
+			return;
+		}
 		if (Script->initialized && Script->onDestroy) {
 			PyObject_CallObject(Script->onDestroy, NULL);
 			if (PyErr_Occurred())
 				CB_ERROR(PythonUtils::GetErrorMessage());
 		}
 		Py_DECREF(Script);
-		PyObject* key = PyUnicode_FromString(m_name.c_str());
-		PyDict_DelItem(PySys_GetObject("modules"), key);
-		Py_DECREF(key);
-		if (PyErr_Occurred())
-			PythonUtils::GetErrorMessage();
 	}
 }

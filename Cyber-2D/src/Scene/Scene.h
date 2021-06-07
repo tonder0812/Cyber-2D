@@ -24,6 +24,9 @@ namespace Cyber {
 		bool Valid(entt::entity e) { return m_Registry.valid(e); }
 		void ResizeCameras();
 		void SetPrimaryCamera(Entity e);
+		Entity FindById(std::string id);
+		std::vector<Entity> FindByClass(std::string Class);
+		static Scene* CurrentScene;
 	private:
 		void Scene::RenderSprites();
 		Entity Scene::GetPrimaryCameraEntity();

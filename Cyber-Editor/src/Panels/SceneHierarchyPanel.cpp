@@ -383,27 +383,27 @@ namespace Cyber {
 			{
 				auto& camera = component.Camera;
 
-				if (ImGui::Checkbox("Primary", &component.Primary) && component.Primary) {
+				if (ImGui::Checkbox("Primary", &component.Camera->Primary) && component.Camera->Primary) {
 					m_Context->SetPrimaryCamera(entity);
 				}
 
 
-				float Size = camera.GetSize();
+				float Size = camera->Camera.GetSize();
 
 				ImGuiStyle& style = ImGui::GetStyle();
 				float width = ImGui::CalcTextSize("Size").x + style.ItemSpacing.x * 3;
 				if (width < 100)
 					width = 100;
 				DrawFloatControl("Size", "S", Size, 10, true, width);
-				camera.SetSize(Size);
+				camera->Camera.SetSize(Size);
 
-				float Near = camera.GetNearClip();
+				float Near = camera->Camera.GetNearClip();
 				DrawFloatControl("Near", "N", Near, -1, true, width);
-				camera.SetNearClip(Near);
+				camera->Camera.SetNearClip(Near);
 
-				float Far = camera.GetFarClip();
+				float Far = camera->Camera.GetFarClip();
 				DrawFloatControl("Far", "F", Far, 1, true, width);
-				camera.SetFarClip(Far);
+				camera->Camera.SetFarClip(Far);
 
 				/*if (ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio))
 					m_Context->ResizeCameras();
@@ -418,11 +418,11 @@ namespace Cyber {
 
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 			{
-				ImGui::ColorEdit4("Color", &component.Color->super_type.r);
-				bool disabled = component.texture.get() == nullptr;
+				ImGui::ColorEdit4("Color", &component.Texture->Color->super_type.r);
+				bool disabled = component.Texture->texture->Texture.get() == nullptr;
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, disabled);
 				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * (disabled ? 0.5f : 1.0f));
-				ImGui::Checkbox("Use texture", &component.UseTexture);
+				ImGui::Checkbox("Use texture", &component.Texture->UseTexture);
 				ImGui::PopStyleVar();
 				ImGui::PopItemFlag();
 				if (ImGui::Button("Load Image"))
@@ -431,13 +431,13 @@ namespace Cyber {
 					if (!path.empty()) {
 						std::string relativePath = std::filesystem::relative(path, Application::Get().getCWD()).string();
 						auto texture = std::make_shared<Texture>(relativePath);
-						component.texture = texture;
+						component.Texture->texture->Texture = texture;
 					}
 				}
 			});
 
 
-		DrawComponent<ScriptComponent>("Script", entity, [](auto& component)
+		DrawComponent<ScriptComponent>("Script", entity, [&](auto& component)
 			{
 				char buffer[256];
 				memset(buffer, 0, sizeof(buffer));
@@ -448,8 +448,15 @@ namespace Cyber {
 				}
 				if (ImGui::Button("Refresh"))
 				{
-					component.Destroy();
-					component.Initialize();
+					auto view = m_Context->m_Registry.view<ScriptComponent>();
+					for (auto entity : view)
+					{
+						auto& script = view.get<ScriptComponent>(entity);
+						if (script.name == component.name) {
+							script.Destroy();
+							script.Initialize();
+						}
+					}
 				}
 			});
 	}

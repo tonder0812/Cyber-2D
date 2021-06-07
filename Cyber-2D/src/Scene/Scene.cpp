@@ -9,9 +9,10 @@
 #include <Imgui.h>
 #include <imgui_internal.h>
 #include <glm/glm.hpp>
+#include "Core/Input.h"
 
 namespace Cyber {
-
+	Scene* Scene::CurrentScene = nullptr;
 	static void rotate(glm::vec3 a[], int n, float x_pivot, float y_pivot,
 		float angle)
 	{
@@ -33,12 +34,14 @@ namespace Cyber {
 	{
 		if (!empty) {
 			Entity MainCamera = CreateEntity("Main Camera", "Camera");
-			MainCamera.AddComponent<CameraComponent>();
+			CameraComponent& camera=MainCamera.AddComponent<CameraComponent>();
+			camera.Camera->Primary = true;
 		}
 	}
 
 	Scene::~Scene()
 	{
+		CurrentScene = this;
 		m_Registry.each([&](auto entityID)
 			{
 				Entity entity{ entityID , this };
@@ -52,6 +55,7 @@ namespace Cyber {
 	}
 	Entity Scene::CreateEntity(const std::string& id, const std::string& Class)
 	{
+		CurrentScene = this;
 		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<TransformComponent>();
 		auto& tag = entity.AddComponent<TagComponent>();
@@ -63,14 +67,17 @@ namespace Cyber {
 
 	void Scene::DestroyEntity(Entity entity)
 	{
+		CurrentScene = this;
 		if (entity.HasComponent<TransformComponent>())entity.GetComponent<TransformComponent>().Destroy();
-		if (entity.HasComponent<ScriptComponent>())entity.GetComponent<ScriptComponent>().Destroy();
+		if (entity.HasComponent<CameraComponent>())entity.GetComponent<CameraComponent>().Destroy();
 		if (entity.HasComponent<SpriteRendererComponent>())entity.GetComponent<SpriteRendererComponent>().Destroy();
+		if (entity.HasComponent<ScriptComponent>())entity.GetComponent<ScriptComponent>().Destroy();
 		m_Registry.destroy(entity);
 	}
 
 	void Scene::OnUpdateEditor(float ts, EditorCamera& editorCamera, std::shared_ptr<Texture> cameraTexture)
 	{
+		CurrentScene = this;
 		Renderer::BeginScene(editorCamera);
 		RenderSprites();
 		Renderer::DrawQuad({ 1000,1000 ,1000 }, { 1,1 }, cameraTexture.get());
@@ -79,7 +86,7 @@ namespace Cyber {
 		Renderer::BeginScene(editorCamera);
 		Entity cameraEntity = GetPrimaryCameraEntity();
 		if (cameraEntity) {
-			SceneCamera& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+			SceneCamera& camera = cameraEntity.GetComponent<CameraComponent>().Camera->Camera;
 			glm::vec3& position = cameraEntity.GetComponent<TransformComponent>().Transform->Translation->super_type;
 			glm::vec3& scale = cameraEntity.GetComponent<TransformComponent>().Transform->Scale->super_type;
 			glm::mat4 trans = glm::scale(glm::translate(glm::mat4(1), position), { 120 / 120.0f ,90 / 120.0f,1 });
@@ -102,10 +109,13 @@ namespace Cyber {
 
 	void Scene::OnUpdateRuntime(float ts)
 	{
+		CurrentScene = this;
 		auto ScriptView = m_Registry.view<ScriptComponent>();
 		for (auto et : ScriptView)
 		{
 			auto& script = ScriptView.get<ScriptComponent>(et);
+			if (!script.Script)
+				continue;
 			if (!script.Script->initialized) {
 				script.Script->initialized = true;
 
@@ -120,7 +130,7 @@ namespace Cyber {
 						CB_ERROR(PythonUtils::GetErrorMessage());
 				}
 			}
-			if (script.Script->onUpdate) {
+			else if (script.Script->onUpdate) {
 				PyObject* pArgs, * pValue;
 				pArgs = PyTuple_New(1);
 				pValue = PyFloat_FromDouble(ts);
@@ -134,8 +144,9 @@ namespace Cyber {
 		}
 		Entity cameraEntity = GetPrimaryCameraEntity();
 		if (cameraEntity) {
-
-			Renderer::BeginScene(Camera{ cameraEntity.GetComponent<CameraComponent>().Camera.GetProjection() , glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform()) });
+			glm::vec2 point = Input::GetMousePositionViewport();
+			
+			Renderer::BeginScene(Camera{ cameraEntity.GetComponent<CameraComponent>().Camera->Camera.GetProjection() , glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform()) });
 			RenderSprites();
 			Renderer::EndScene();
 		}
@@ -149,14 +160,54 @@ namespace Cyber {
 		for (auto et : SpriteGroup)
 		{
 			auto [transform, sprite] = SpriteGroup.get<TransformComponent, SpriteRendererComponent>(et);
-			if (sprite.UseTexture) {
-				Renderer::DrawQuad(transform.GetTransform(), sprite.texture.get(), 1, sprite.Color->super_type, (int)et);
+			if (sprite.Texture->UseTexture) {
+				Renderer::DrawQuad(transform.GetTransform(), sprite.Texture->texture->Texture.get(), 1, sprite.Texture->Color->super_type, (int)et);
 			}
 			else {
-				Renderer::DrawQuad(transform.GetTransform(), sprite.Color->super_type, (int)et);
+				Renderer::DrawQuad(transform.GetTransform(), sprite.Texture->Color->super_type, (int)et);
 			}
 		}
 	}
+
+	Entity Scene::FindById(std::string id) {
+		auto view = m_Registry.view<TagComponent>();
+		for (auto entity : view)
+		{
+			const auto& Id = view.get<TagComponent>(entity).Id;
+			if (id == Id)
+				return Entity{ entity, this };
+		}
+		return {};
+	}
+
+	static void tokenize(std::string const& str, const char delim,
+		std::vector<std::string>& out)
+	{
+		std::stringstream ss(str);
+
+		std::string s;
+		while (std::getline(ss, s, delim)) {
+			out.push_back(s);
+		}
+	}
+
+	std::vector<Entity> Scene::FindByClass(std::string Class) {
+		auto view = m_Registry.view<TagComponent>();
+		std::vector<Entity> entities;
+		for (auto entity : view)
+		{
+			std::vector<std::string> Classes;
+			tokenize(view.get<TagComponent>(entity).Class, ' ', Classes);
+			for (std::string _Class : Classes)
+				if (Class == _Class) {
+					entities.push_back({ entity, this });
+					break;
+				}
+
+		}
+		return entities;
+	}
+
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
@@ -168,24 +219,26 @@ namespace Cyber {
 	}
 	void Scene::ResizeCameras()
 	{
+		CurrentScene = this;
 		// Resize our non-FixedAspectRatio cameras
 		auto view = m_Registry.view<CameraComponent>();
 		for (auto entity : view)
 		{
 			auto& cameraComponent = view.get<CameraComponent>(entity);
-			if (!cameraComponent.FixedAspectRatio)
-				cameraComponent.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+			if (!cameraComponent.Camera->FixedAspectRatio)
+				cameraComponent.Camera->Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 		}
 	}
 
 	void Scene::SetPrimaryCamera(Entity e) {
+		CurrentScene = this;
 		auto view = m_Registry.view<CameraComponent>();
 		for (auto entity : view)
 		{
 			auto& cameraComponent = view.get<CameraComponent>(entity);
-			cameraComponent.Primary = false;
+			cameraComponent.Camera->Primary = false;
 		}
-		e.GetComponent<CameraComponent>().Primary = true;
+		e.GetComponent<CameraComponent>().Camera->Primary = true;
 	}
 
 	Entity Scene::GetPrimaryCameraEntity()
@@ -194,7 +247,7 @@ namespace Cyber {
 		for (auto entity : view)
 		{
 			const auto& camera = view.get<CameraComponent>(entity);
-			if (camera.Primary)
+			if (camera.Camera->Primary)
 				return Entity{ entity, this };
 		}
 		return {};
@@ -230,9 +283,9 @@ namespace Cyber {
 	template<>
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
 	{
-		component.FixedAspectRatio = true;
-		//component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
-		component.Camera.SetAspectRatio(16 / 9.0f);
+		component.Camera->entity = entity;
+		component.Camera->Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		//component.Camera->Camera.SetAspectRatio(16 / 9.0f);
 	}
 
 	template<>

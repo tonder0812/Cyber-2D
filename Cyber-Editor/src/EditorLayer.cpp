@@ -120,14 +120,15 @@ namespace Cyber {
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 		auto viewportOffset = ImGui::GetWindowPos();
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		if (viewportPanelSize.x / 1.7777777 < viewportPanelSize.y) {
+			m_ViewportSizeScene = { viewportPanelSize.x, viewportPanelSize.x / 1.7777777 };
+		}
+		else {
+			m_ViewportSizeScene = { viewportPanelSize.y * 1.7777777, viewportPanelSize.y };
+		}
 		if (m_Runtime)
 		{
-			if (viewportPanelSize.x / 1.7777777 < viewportPanelSize.y) {
-				m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.x / 1.7777777 };
-			}
-			else {
-				m_ViewportSize = { viewportPanelSize.y * 1.7777777, viewportPanelSize.y };
-			}
+			m_ViewportSize = m_ViewportSizeScene;
 		}
 		else {
 			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
@@ -258,7 +259,7 @@ namespace Cyber {
 			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
 		{
 			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_CurrentScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+			m_CurrentScene->OnViewportResize(m_ViewportSizeScene.x, m_ViewportSizeScene.y);
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 		if (!m_Runtime) {
@@ -351,7 +352,7 @@ namespace Cyber {
 				serializer.Deserialize(Application::Get().getPath().string() + "\\temp\\temp.cyber");
 
 				m_SceneHierarchyPanel.SetContext(m_CurrentScene);
-				m_CurrentScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+				m_CurrentScene->OnViewportResize((uint32_t)m_ViewportSizeScene.x, (uint32_t)m_ViewportSizeScene.y);
 				m_Runtime = false;
 			}
 			else {
@@ -372,7 +373,7 @@ namespace Cyber {
 	{
 		m_Runtime = false;
 		m_CurrentScene = new Scene();
-		m_CurrentScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_CurrentScene->OnViewportResize((uint32_t)m_ViewportSizeScene.x, (uint32_t)m_ViewportSizeScene.y);
 		m_SceneHierarchyPanel.SetContext(m_CurrentScene);
 	}
 
@@ -384,7 +385,7 @@ namespace Cyber {
 		{
 			delete m_CurrentScene;
 			m_CurrentScene = new Scene(true);
-			m_CurrentScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_CurrentScene->OnViewportResize((uint32_t)m_ViewportSizeScene.x, (uint32_t)m_ViewportSizeScene.y);
 			m_SceneHierarchyPanel.SetContext(m_CurrentScene);
 
 			SceneSerializer serializer(*m_CurrentScene);

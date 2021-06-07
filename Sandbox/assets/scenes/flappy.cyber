@@ -1,31 +1,218 @@
 Scene: Untitled
 Entities:
-  - Entity: Background 3
+  - Entity: Start
     TagComponent:
       Class: ""
     OrderComponent:
-      Order: 5
+      Order: 19
     TransformComponent:
-      Translation: [17, 0, 0]
+      Translation: [0, 0, 1]
+      Rotation: 0
+      Scale: [7, 15, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\message.png
+  - Entity: Pipe0 Down
+    TagComponent:
+      Class: Pipe
+    OrderComponent:
+      Order: 10
+    TransformComponent:
+      Translation: [20, -4, 0.5]
+      Rotation: 0
+      Scale: [2.5, 15, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\pipe-green.png
+    ScriptComponent:
+      Name: pipe
+  - Entity: Pipe0 Up
+    TagComponent:
+      Class: Pipe Up
+    OrderComponent:
+      Order: 11
+    TransformComponent:
+      Translation: [20, 14, 0.5]
+      Rotation: 0
+      Scale: [2.5, -15, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\pipe-green.png
+    ScriptComponent:
+      Name: pipe
+  - Entity: Pipe1 Down
+    TagComponent:
+      Class: Pipe
+    OrderComponent:
+      Order: 12
+    TransformComponent:
+      Translation: [30.5, -4, 0.5]
+      Rotation: 0
+      Scale: [2.5, 15, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\pipe-green.png
+    ScriptComponent:
+      Name: pipe
+  - Entity: Pipe1 Up
+    TagComponent:
+      Class: Pipe Up
+    OrderComponent:
+      Order: 13
+    TransformComponent:
+      Translation: [30.5, 14, 0.5]
+      Rotation: 0
+      Scale: [2.5, -15, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\pipe-green.png
+    ScriptComponent:
+      Name: pipe
+  - Entity: Pipe2 Down
+    TagComponent:
+      Class: Pipe
+    OrderComponent:
+      Order: 14
+    TransformComponent:
+      Translation: [41, -4, 0.5]
+      Rotation: 0
+      Scale: [2.5, 15, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\pipe-green.png
+    ScriptComponent:
+      Name: pipe
+  - Entity: Pipe2 Up
+    TagComponent:
+      Class: Pipe Up
+    OrderComponent:
+      Order: 15
+    TransformComponent:
+      Translation: [41, 14, 0.5]
+      Rotation: 0
+      Scale: [2.5, -15, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\pipe-green.png
+    ScriptComponent:
+      Name: pipe
+  - Entity: Pipe3 Down
+    TagComponent:
+      Class: Pipe
+    OrderComponent:
+      Order: 16
+    TransformComponent:
+      Translation: [51.5, -4, 0.5]
+      Rotation: 0
+      Scale: [2.5, 15, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\pipe-green.png
+    ScriptComponent:
+      Name: pipe
+  - Entity: Pipe3 Up
+    TagComponent:
+      Class: Pipe Up
+    OrderComponent:
+      Order: 17
+    TransformComponent:
+      Translation: [51.5, 14, 0.5]
+      Rotation: 0
+      Scale: [2.5, -15, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\pipe-green.png
+    ScriptComponent:
+      Name: pipe
+  - Entity: Digit0
+    TagComponent:
+      Class: Digit
+    OrderComponent:
+      Order: 9
+    TransformComponent:
+      Translation: [-13.5, 8.5, 1]
+      Rotation: 0
+      Scale: [1, 1.5, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\0.png
+  - Entity: Digit1
+    TagComponent:
+      Class: Digit
+    OrderComponent:
+      Order: 8
+    TransformComponent:
+      Translation: [-14.75, 8.5, 1]
+      Rotation: 0
+      Scale: [1, 1.5, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\0.png
+  - Entity: Digit2
+    TagComponent:
+      Class: Digit
+    OrderComponent:
+      Order: 7
+    TransformComponent:
+      Translation: [-16, 8.5, 1]
+      Rotation: 0
+      Scale: [1, 1.5, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\0.png
+  - Entity: Floor
+    TagComponent:
+      Class: ""
+    OrderComponent:
+      Order: 6
+    TransformComponent:
+      Translation: [0, -8.5, 0.300000012]
+      Rotation: 0
+      Scale: [50, 3, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\base.png
+  - Entity: Background 1
+    TagComponent:
+      Class: ""
+    OrderComponent:
+      Order: 3
+    TransformComponent:
+      Translation: [-13, 0, 0.100000001]
       Rotation: 0
       Scale: [15, 20, 1]
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
       UseTexture: true
       Texture: assets\textures\Flappy bird\background-day.png
-  - Entity: Background 2
+  - Entity: Bird
     TagComponent:
       Class: ""
     OrderComponent:
-      Order: 4
+      Order: 2
     TransformComponent:
-      Translation: [2, 0, 0]
+      Translation: [-10, 0, 0.200000003]
       Rotation: 0
-      Scale: [15, 20, 1]
+      Scale: [1.5, 1.25, 1]
     SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
+      Color: [0.999991417, 1, 0.999989986, 1]
       UseTexture: true
-      Texture: assets\textures\Flappy bird\background-day.png
+      Texture: assets\textures\Flappy bird\bluebird-upflap.png
+    ScriptComponent:
+      Name: flappy
   - Entity: Main Camera
     TagComponent:
       Class: Camera
@@ -40,47 +227,45 @@ Entities:
         Size: 20
         Near: -1
         Far: 1
-        AspectRatio: 1.777777777777
+        AspectRatio: 1.77777779
       Primary: true
       FixedAspectRatio: true
-  - Entity: Bird
+  - Entity: Background 2
     TagComponent:
       Class: ""
     OrderComponent:
-      Order: 2
+      Order: 4
     TransformComponent:
-      Translation: [-10, 0, 0.100000001]
-      Rotation: 0
-      Scale: [1.5, 1.25, 1]
-    SpriteRendererComponent:
-      Color: [0.999991417, 1, 0.999989986, 1]
-      UseTexture: true
-      Texture: assets\textures\Flappy bird\bluebird-upflap.png
-    ScriptComponent:
-      Name: flappy
-  - Entity: Background 1
-    TagComponent:
-      Class: ""
-    OrderComponent:
-      Order: 3
-    TransformComponent:
-      Translation: [-13, 0, 0]
+      Translation: [2, 0, 0.100000001]
       Rotation: 0
       Scale: [15, 20, 1]
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
       UseTexture: true
       Texture: assets\textures\Flappy bird\background-day.png
-  - Entity: Floor
+  - Entity: Background 3
     TagComponent:
       Class: ""
     OrderComponent:
-      Order: 6
+      Order: 5
     TransformComponent:
-      Translation: [0, -8.5, 1]
+      Translation: [17, 0, 0.100000001]
       Rotation: 0
-      Scale: [50, 3, 1]
+      Scale: [15, 20, 1]
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
       UseTexture: true
-      Texture: assets\textures\Flappy bird\base.png
+      Texture: assets\textures\Flappy bird\background-day.png
+  - Entity: GameOver
+    TagComponent:
+      Class: ""
+    OrderComponent:
+      Order: 18
+    TransformComponent:
+      Translation: [0, 3, 0]
+      Rotation: 0
+      Scale: [8, 2, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+      UseTexture: true
+      Texture: assets\textures\Flappy bird\gameover.png

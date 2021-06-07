@@ -58,46 +58,32 @@ namespace Cyber {
 
 	struct SpriteRendererComponent
 	{
-		vec<4, float>* Color;
-		std::shared_ptr<Texture> texture;
-		bool UseTexture = false;
+		SpriteRendererComponentObject* Texture;
 		SpriteRendererComponent() {
-			PyObject* pVec4Type = Application::Get().GetPyGLM_Vec4();
-			Color = (vec<4, float> *)PyObject_CallObject(pVec4Type, NULL);
-			Color->super_type = { 1,1,1,1 };
+			Texture = (SpriteRendererComponentObject*)PyObject_CallObject(Application::Get().GetPyCyber_SpriteRenderer(), NULL);
+			if (PyErr_Occurred())
+				CB_ERROR(PythonUtils::GetErrorMessage());
+			CB_CORE_ASSERT(Texture, "Error when initializing Sprite");
 		};
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
-		SpriteRendererComponent(const glm::vec4& color)
-			: texture(nullptr), UseTexture(false) {
-			PyObject* pVec4Type = Application::Get().GetPyGLM_Vec4();
-			Color = (vec<4, float> *)PyObject_CallObject(pVec4Type, NULL);
-			Color->super_type = color;
-		}
-		SpriteRendererComponent(std::shared_ptr<Texture> tex)
-			: texture(tex), UseTexture(true) {
-			PyObject* pVec4Type = Application::Get().GetPyGLM_Vec4();
-			Color = (vec<4, float> *)PyObject_CallObject(pVec4Type, NULL);
-			Color->super_type = { 1,1,1,1 };
-		}
-		SpriteRendererComponent(const glm::vec4& color, std::shared_ptr<Texture> tex)
-			: texture(tex), UseTexture(true) {
-			PyObject* pVec4Type = Application::Get().GetPyGLM_Vec4();
-			Color = (vec<4, float> *)PyObject_CallObject(pVec4Type, NULL);
-			Color->super_type = color;
-		}
 		void Destroy() {
-			Py_DECREF(Color);
+			Py_DECREF(Texture);
 		}
 	};
 
 	struct CameraComponent
 	{
-		SceneCamera Camera;
-		bool Primary = true;
-		bool FixedAspectRatio = false;
-
-		CameraComponent() = default;
+		CameraComponentObject* Camera;
+		CameraComponent() {
+			Camera = (CameraComponentObject*)PyObject_CallObject(Application::Get().GetPyCyber_Camera(), NULL);
+			if (PyErr_Occurred())
+				CB_ERROR(PythonUtils::GetErrorMessage());
+			CB_CORE_ASSERT(Camera, "Error when initializing Camera");
+		};
 		CameraComponent(const CameraComponent&) = default;
+		void Destroy() {
+			Py_DECREF(Camera);
+		}
 	};
 
 	struct ScriptComponent

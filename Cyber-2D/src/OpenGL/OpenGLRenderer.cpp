@@ -260,7 +260,9 @@ namespace Cyber {
 
 		if (s_Data->QuadIndexCount >= s_Data->MaxIndices)
 			NextBatch();
-
+		if (texture->GetWidth() == 0) {
+			texture = s_Data->TextureSlots[0];
+		}
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data->TextureSlotIndex; i++)
 		{

@@ -36,6 +36,7 @@ namespace Cyber {
 		if (m_Path.is_relative()) {
 			m_Path = std::filesystem::canonical(m_Path);
 		}
+		CB_CORE_TRACE(m_Path.string());
 		std::wstring path = m_Path.wstring();
 		std::wstringstream ss;
 		ss << L".;";
@@ -70,8 +71,11 @@ namespace Cyber {
 		m_PyGLM_Mat4 = PythonUtils::GetFuncFromModule(m_PyGLM, "mat4");
 
 		m_PyCyber = PyImport_ImportModule("Cyber");
+		m_PyCyber_Texture = PythonUtils::GetFuncFromModule(m_PyCyber, "Texture");
 		m_PyCyber_Entity = PythonUtils::GetFuncFromModule(m_PyCyber, "Entity");
 		m_PyCyber_Transform = PythonUtils::GetFuncFromModule(m_PyCyber, "TransformComponent");
+		m_PyCyber_SpriteRenderer = PythonUtils::GetFuncFromModule(m_PyCyber, "SpriteRendererComponent");
+		m_PyCyber_Camera = PythonUtils::GetFuncFromModule(m_PyCyber, "CameraComponent");
 		m_PyCyber_Script = PythonUtils::GetFuncFromModule(m_PyCyber, "ScriptComponent");
 
 

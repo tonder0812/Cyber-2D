@@ -7,9 +7,10 @@ def Start():
 	Cyber.Log.Warn("Warning")
 	Cyber.Log.Info("Info")
 	Cyber.Log.Trace("Trace")
+	Cyber.Scene.FindByID("Main Camera").GetCamera().Size=100
 
-def Update(ts,transform):
-
+def Update(ts):
+	transform=this.GetTransform()
 	if(Cyber.Input.IsKeyPressed("LEFT")):
 		transform.Translation.x-=speed*ts
 	elif(Cyber.Input.IsKeyPressed("RIGHT")):

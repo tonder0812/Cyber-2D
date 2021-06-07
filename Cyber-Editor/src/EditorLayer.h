@@ -28,6 +28,7 @@ namespace Cyber {
 	private:
 		Scene* m_CurrentScene;
 		glm::vec2 m_ViewportSize = { 1,1 };
+		glm::vec2 m_ViewportSizeScene;
 		EditorCamera m_EditorCamera;
 		Framebuffer* m_Framebuffer = nullptr;
 		SceneHierarchyPanel m_SceneHierarchyPanel;

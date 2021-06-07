@@ -140,14 +140,14 @@ namespace Cyber {
 
 			out << YAML::Key << "Camera" << YAML::Value;
 			out << YAML::BeginMap; // Camera;
-			out << YAML::Key << "Size" << YAML::Value << camera.GetSize();
-			out << YAML::Key << "Near" << YAML::Value << camera.GetNearClip();
-			out << YAML::Key << "Far" << YAML::Value << camera.GetFarClip();
-			out << YAML::Key << "AspectRatio" << YAML::Value << cameraComponent.Camera.GetAspectRatio();
+			out << YAML::Key << "Size" << YAML::Value << camera->Camera.GetSize();
+			out << YAML::Key << "Near" << YAML::Value << camera->Camera.GetNearClip();
+			out << YAML::Key << "Far" << YAML::Value << camera->Camera.GetFarClip();
+			out << YAML::Key << "AspectRatio" << YAML::Value << cameraComponent.Camera->Camera.GetAspectRatio();
 			out << YAML::EndMap; // Camera
 
-			out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
-			out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.FixedAspectRatio;
+			out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Camera->Primary;
+			out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.Camera->FixedAspectRatio;
 
 			out << YAML::EndMap; // CameraComponent
 		}
@@ -158,9 +158,9 @@ namespace Cyber {
 			out << YAML::BeginMap; // SpriteRendererComponent
 
 			auto& spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
-			out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color->super_type;
-			out << YAML::Key << "UseTexture" << YAML::Value << spriteRendererComponent.UseTexture;
-			out << YAML::Key << "Texture" << YAML::Value << (spriteRendererComponent.texture.get() ? spriteRendererComponent.texture->GetPath() : std::string(""));
+			out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Texture->Color->super_type;
+			out << YAML::Key << "UseTexture" << YAML::Value << spriteRendererComponent.Texture->UseTexture;
+			out << YAML::Key << "Texture" << YAML::Value << (spriteRendererComponent.Texture->texture->Texture.get() ? spriteRendererComponent.Texture->texture->Texture->GetPath() : std::string(""));
 
 			out << YAML::EndMap; // SpriteRendererComponent
 		}
@@ -246,24 +246,24 @@ namespace Cyber {
 
 					auto& cameraProps = cameraComponent["Camera"];
 
-					cc.Camera.SetSize(cameraProps["Size"].as<float>());
-					cc.Camera.SetNearClip(cameraProps["Near"].as<float>());
-					cc.Camera.SetFarClip(cameraProps["Far"].as<float>());
-					cc.Camera.SetAspectRatio(cameraProps["AspectRatio"].as<float>());
+					cc.Camera->Camera.SetSize(cameraProps["Size"].as<float>());
+					cc.Camera->Camera.SetNearClip(cameraProps["Near"].as<float>());
+					cc.Camera->Camera.SetFarClip(cameraProps["Far"].as<float>());
+					cc.Camera->Camera.SetAspectRatio(cameraProps["AspectRatio"].as<float>());
 
-					cc.Primary = cameraComponent["Primary"].as<bool>();
-					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+					cc.Camera->Primary = cameraComponent["Primary"].as<bool>();
+					cc.Camera->FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
 				}
 
 				auto spriteRendererComponent = entity["SpriteRendererComponent"];
 				if (spriteRendererComponent)
 				{
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
-					src.Color->super_type = spriteRendererComponent["Color"].as<glm::vec4>();
-					src.UseTexture = spriteRendererComponent["UseTexture"].as<bool>();
+					src.Texture->Color->super_type = spriteRendererComponent["Color"].as<glm::vec4>();
+					src.Texture->UseTexture = spriteRendererComponent["UseTexture"].as<bool>();
 					std::string path = spriteRendererComponent["Texture"].as<std::string>();
 					if (!path.empty())
-						src.texture = std::make_shared<Texture>(path);
+						src.Texture->texture->Texture = std::make_shared<Texture>(path);
 				}
 
 				auto scriptComponent = entity["ScriptComponent"];

@@ -4,7 +4,6 @@
 #include <stb_image.h>
 #include "OpenGL/OpenGLErrorCallback.h"
 namespace Cyber {
-
 	Texture::Texture(uint32_t width, uint32_t height, GLenum internalFormat, GLenum dataFormat)
 		: m_Width(width), m_Height(height), m_InternalFormat(internalFormat), m_DataFormat(dataFormat)
 	{
@@ -26,7 +25,12 @@ namespace Cyber {
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
 		stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-		CB_CORE_ASSERT(data, "Failed to load image!");
+		//CB_CORE_ASSERT(data, "Failed to load image!");
+		if (!data) {
+			m_Width = 0;
+			m_Height = 0;
+			return;
+		}
 		m_Width = width;
 		m_Height = height;
 
@@ -50,7 +54,13 @@ namespace Cyber {
 			break;
 		}
 
-		CB_CORE_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
+		//CB_CORE_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
+		if (!(m_InternalFormat & m_DataFormat)) {
+			m_Width = 0;
+			m_Height = 0;
+			stbi_image_free(data);
+			return;
+		}
 
 		glGenTextures(1, &m_ID);
 		glBindTexture(GL_TEXTURE_2D, m_ID);

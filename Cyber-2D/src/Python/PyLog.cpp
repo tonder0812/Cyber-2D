@@ -5,7 +5,6 @@
 static char* ConvertToString(PyObject* args) {
 	PyObject* obj = nullptr;
 	if (!PyArg_ParseTuple(args, "O", &obj)) {
-		Py_DECREF(args);
 		return NULL;
 	}
 	PyObject* repr = PyObject_Str(obj);
@@ -13,11 +12,10 @@ static char* ConvertToString(PyObject* args) {
 	char* bytes = PyBytes_AS_STRING(str);
 	Py_DECREF(repr);
 	Py_DECREF(str);
-	Py_DECREF(args);
 	return bytes;
 }
 
-PyObject* LogTypeError(PyObject* self, PyObject* args) {
+static PyObject* LogTypeError(PyObject* self, PyObject* args) {
 	char* str = ConvertToString(args);
 	if (str) {
 		CB_ERROR(str);
@@ -28,7 +26,7 @@ PyObject* LogTypeError(PyObject* self, PyObject* args) {
 	}
 }
 
-PyObject* LogTypeWarn(PyObject* self, PyObject* args) {
+static PyObject* LogTypeWarn(PyObject* self, PyObject* args) {
 	char* str = ConvertToString(args);
 	if (str) {
 		CB_WARN(str);
@@ -39,7 +37,7 @@ PyObject* LogTypeWarn(PyObject* self, PyObject* args) {
 	}
 }
 
-PyObject* LogTypeInfo(PyObject* self, PyObject* args) {
+static PyObject* LogTypeInfo(PyObject* self, PyObject* args) {
 	char* str = ConvertToString(args);
 	if (str) {
 		CB_INFO(str);
@@ -50,7 +48,7 @@ PyObject* LogTypeInfo(PyObject* self, PyObject* args) {
 	}
 }
 
-PyObject* LogTypeTrace(PyObject* self, PyObject* args) {
+static PyObject* LogTypeTrace(PyObject* self, PyObject* args) {
 	char* str = ConvertToString(args);
 	if (str) {
 		CB_TRACE(str);
@@ -61,7 +59,7 @@ PyObject* LogTypeTrace(PyObject* self, PyObject* args) {
 	}
 }
 
-PyMethodDef LogMethods[] = {
+static PyMethodDef LogMethods[] = {
 	{"Error", (PyCFunction)LogTypeError, METH_STATIC | METH_VARARGS,
 	 "Log a error message to the console"
 	},
