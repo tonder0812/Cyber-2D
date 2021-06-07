@@ -116,6 +116,38 @@ namespace Cyber {
 					}
 				}
 			}
+			if (ImGui::MenuItem("Duplicate Entity")) {
+				TagComponent& tag = entity.GetComponent<TagComponent>();
+				std::string Id = tag.Id + " Copy";
+				std::string Class = tag.Class;
+				Entity newEntity=m_Context->CreateEntity(Id, Class);
+				
+				TransformComponentObject* Transform = entity.GetComponent<TransformComponent>().Transform;
+				TransformComponentObject* newTransform=newEntity.GetComponent<TransformComponent>().Transform;
+				newTransform->Translation->super_type = Transform->Translation->super_type;
+				newTransform->Rotation = Transform->Rotation;
+				newTransform->Scale->super_type = Transform->Scale->super_type;
+				
+				if (entity.HasComponent<CameraComponent>()) {
+					CameraComponentObject* Camera = entity.GetComponent<CameraComponent>().Camera;
+					CameraComponentObject* newCamera = newEntity.AddComponent<CameraComponent>().Camera;
+					newCamera->Camera = Camera->Camera;
+					newCamera->FixedAspectRatio = Camera->FixedAspectRatio;
+				}
+				
+				if (entity.HasComponent<SpriteRendererComponent>()) {
+					SpriteRendererComponentObject* Texture = entity.GetComponent<SpriteRendererComponent>().Texture;
+					SpriteRendererComponentObject* newTexture = newEntity.AddComponent<SpriteRendererComponent>().Texture;
+					newTexture->Color->super_type = Texture->Color->super_type;
+					newTexture->UseTexture = Texture->UseTexture;
+					newTexture->texture->Texture = Texture->texture->Texture;
+				}
+
+				if (entity.HasComponent<ScriptComponent>()) {
+					newEntity.AddComponent<ScriptComponent>(entity.GetComponent<ScriptComponent>().GetName());
+				}
+
+			}
 			if (ImGui::MenuItem("Delete Entity")) {
 				m_Context->DestroyEntity(entity);
 				if (m_SelectionContext == entity)
