@@ -22,7 +22,7 @@ namespace Cyber {
 		m_iniPath = Application::Get().getPath().string() + "/imgui.ini";
 #else
 		std::filesystem::path tmp = Application::Get().getPath() / L"..\\..\\..\\imgui.ini";
-		m_iniPath = std::filesystem::canonical(tmp).string();
+		m_iniPath = std::filesystem::weakly_canonical(tmp).string();
 #endif
 		io.IniFilename = m_iniPath.c_str();
 

@@ -84,10 +84,10 @@ namespace Cyber {
 	{
 	}
 
-	static void SerializeEntity(YAML::Emitter& out, Entity entity)
+	static void SerializeEntity(YAML::Emitter& out, Entity entity, const std::string& filepath)
 	{
 		out << YAML::BeginMap; // Entity
-		out << YAML::Key << "Entity"; // TODO: Entity ID goes here
+		out << YAML::Key << "Entity";
 
 		if (entity.HasComponent<TagComponent>())
 		{
@@ -160,7 +160,16 @@ namespace Cyber {
 			auto& spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
 			out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Texture->Color->super_type;
 			out << YAML::Key << "UseTexture" << YAML::Value << spriteRendererComponent.Texture->UseTexture;
-			out << YAML::Key << "Texture" << YAML::Value << (spriteRendererComponent.Texture->texture->Texture.get() ? spriteRendererComponent.Texture->texture->Texture->GetPath() : std::string(""));
+			if (spriteRendererComponent.Texture->texture->Texture.get()) {
+
+				std::filesystem::path file(filepath);
+				std::filesystem::path absolute = std::filesystem::canonical(Application::Get().getCWD() / spriteRendererComponent.Texture->texture->Texture->GetPath());
+				std::string relative = std::filesystem::relative(absolute, file.parent_path()).string();
+				out << YAML::Key << "Texture" << YAML::Value << relative;
+			}
+			else {
+				out << YAML::Key << "Texture" << YAML::Value << std::string("");
+			}
 
 			out << YAML::EndMap; // SpriteRendererComponent
 		}
@@ -191,7 +200,7 @@ namespace Cyber {
 				if (!entity)
 					return;
 
-				SerializeEntity(out, entity);
+				SerializeEntity(out, entity, filepath);
 			});
 		out << YAML::EndSeq;
 		out << YAML::EndMap;

@@ -34,7 +34,7 @@ namespace Cyber {
 		PyObject* GetPyCyber_Camera() { return m_PyCyber_Camera; };
 		PyObject* GetPyCyber_SpriteRenderer() { return m_PyCyber_SpriteRenderer; };
 		PyObject* GetPyCyber_Script() { return m_PyCyber_Script; };
-		std::filesystem::path getCWD() { return m_CWD; };
+		std::filesystem::path getCWD() { return std::filesystem::current_path(); };
 		std::filesystem::path getPath() { return m_Path; };
 	private:
 		static Application* s_Instance;
@@ -59,7 +59,6 @@ namespace Cyber {
 		PyObject* m_PyCyber_Camera = nullptr;
 		PyObject* m_PyCyber_SpriteRenderer = nullptr;
 		PyObject* m_PyCyber_Script = nullptr;
-		std::filesystem::path m_CWD;
 		std::filesystem::path m_Path;
 	};
 }

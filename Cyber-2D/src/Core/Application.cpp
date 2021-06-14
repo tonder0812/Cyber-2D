@@ -18,9 +18,6 @@ namespace Cyber {
 	Application::Application(int argc, char** argv, const std::string& name) {
 		CB_CORE_ASSERT(!s_Instance, "Aplication Already Open");
 		this->name = name;
-		//Get cwd
-		m_CWD = std::filesystem::current_path();
-		CB_CORE_INFO(m_CWD.string());
 
 		//decode argv
 		wchar_t** _argv = new wchar_t* [argc];

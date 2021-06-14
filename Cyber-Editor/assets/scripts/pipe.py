@@ -28,20 +28,23 @@ Public={
 other=None
 gap=10
 deviation=4
+nPipes=0
 def Start():
-	global other
+	global other,nPipes
+	while(Cyber.Scene.FindByID(f"Pipe{nPipes} Up")):
+		nPipes+=1
 	if("Up" in this.Class):
 		other=Cyber.Scene.FindByID(this.Id.replace("Up","Down"))
 		rnd=random.random()*deviation*2-deviation
 		this.GetTransform().Translation.y=rnd + gap
 		other.GetTransform().Translation.y=rnd - gap
 
-def Update(ts):
+def Update(ts): 
 	if(not Cyber.Scene.FindByID("Bird").GetScript().Public["playing"]):
 		return
 	this.GetTransform().Translation.x-=10*ts
 	if(this.GetTransform().Translation.x<-19):
-		this.GetTransform().Translation.x=Cyber.Scene.FindByID("Pipe"+str((int(this.Id[4])+3)%4)+" Up").GetTransform().Translation.x + 10.5
+		this.GetTransform().Translation.x=Cyber.Scene.FindByID("Pipe"+str((int(this.Id[4])+nPipes-1)%nPipes)+" Up").GetTransform().Translation.x + 10.5
 		
 		if("Up" in this.Class):
 			Public["Passed"]=False

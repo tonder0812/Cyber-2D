@@ -4,7 +4,7 @@ namespace Cyber {
 	class FileDialogs
 	{
 	public:
-		static std::string OpenFile(const char* filter);
-		static std::string SaveFile(const char* filter);
+		static std::string OpenFile(const char* filter, bool changeLocation = false);
+		static std::string SaveFile(const char* filter, bool changeLocation = false);
 	};
 }

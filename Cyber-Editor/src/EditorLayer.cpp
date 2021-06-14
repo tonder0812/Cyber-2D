@@ -110,6 +110,7 @@ namespace Cyber {
 		ImGui::Text("Keyboard blocked: %d", Input::IsKeyboardBlocked());
 		ImGui::Text("Hovered id: %d", m_HoveredEntity ? m_HoveredEntity : -1);
 		ImGui::Text("Hovered entity: %s", m_HoveredEntity ? (m_HoveredEntity.GetComponent<TagComponent>().Id.c_str()) : "");
+		ImGui::Text("CWD: %s", Application::Get().getCWD().string().c_str());
 		ImGui::End();
 #endif
 
@@ -380,7 +381,7 @@ namespace Cyber {
 	void EditorLayer::OpenScene()
 	{
 		//m_Runtime = false;
-		std::string filepath = FileDialogs::OpenFile("Scene (*.cyber)\0*.cyber\0");
+		std::string filepath = FileDialogs::OpenFile("Scene (*.cyber)\0*.cyber\0",true);
 		if (!filepath.empty())
 		{
 			delete m_CurrentScene;
@@ -400,6 +401,7 @@ namespace Cyber {
 		{
 			SceneSerializer serializer(*m_CurrentScene);
 			serializer.Serialize(filepath);
+			std::filesystem::current_path(std::filesystem::path(filepath).parent_path());
 		}
 	}
 
