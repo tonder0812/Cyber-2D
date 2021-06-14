@@ -227,7 +227,7 @@ Entities:
         Size: 20
         Near: -1
         Far: 1
-        AspectRatio: 1.77915192
+        AspectRatio: 1.77663231
       Primary: true
       FixedAspectRatio: false
   - Entity: Background 2

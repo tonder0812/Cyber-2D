@@ -84,7 +84,7 @@ namespace Cyber {
 	{
 	}
 
-	static void SerializeEntity(YAML::Emitter& out, Entity entity, const std::string& filepath)
+	static void SerializeEntity(YAML::Emitter& out, Entity entity, const std::string& filepath, bool useAbsolutePaths)
 	{
 		out << YAML::BeginMap; // Entity
 		out << YAML::Key << "Entity";
@@ -164,8 +164,13 @@ namespace Cyber {
 
 				std::filesystem::path file(filepath);
 				std::filesystem::path absolute = std::filesystem::canonical(Application::Get().getCWD() / spriteRendererComponent.Texture->texture->Texture->GetPath());
-				std::string relative = std::filesystem::relative(absolute, file.parent_path()).string();
-				out << YAML::Key << "Texture" << YAML::Value << relative;
+				if (useAbsolutePaths) {
+					out << YAML::Key << "Texture" << YAML::Value << absolute.string();
+				}
+				else {
+					std::string relative = std::filesystem::relative(absolute, file.parent_path()).string();
+					out << YAML::Key << "Texture" << YAML::Value << relative;
+				}
 			}
 			else {
 				out << YAML::Key << "Texture" << YAML::Value << std::string("");
@@ -188,7 +193,7 @@ namespace Cyber {
 		out << YAML::EndMap; // Entity
 	}
 
-	void SceneSerializer::Serialize(const std::string& filepath)
+	void SceneSerializer::Serialize(const std::string& filepath, bool useAbsolutePaths)
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -200,7 +205,7 @@ namespace Cyber {
 				if (!entity)
 					return;
 
-				SerializeEntity(out, entity, filepath);
+				SerializeEntity(out, entity, filepath, useAbsolutePaths);
 			});
 		out << YAML::EndSeq;
 		out << YAML::EndMap;

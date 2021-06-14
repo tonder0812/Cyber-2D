@@ -5,6 +5,12 @@
 #include "Python/Python.h"
 
 namespace Cyber {
+	typedef bool (*HotkeyFunc)();
+	struct Hotkey {
+		HotkeyFunc func;
+		int key;
+		int mods;
+	};
 	class LayerStack;
 	class Application {
 	public:
@@ -36,6 +42,8 @@ namespace Cyber {
 		PyObject* GetPyCyber_Script() { return m_PyCyber_Script; };
 		std::filesystem::path getCWD() { return std::filesystem::current_path(); };
 		std::filesystem::path getPath() { return m_Path; };
+
+		void RegisterHotkey(Hotkey hotkey) { m_Hotkeys.push_back(hotkey); }
 	private:
 		static Application* s_Instance;
 		Window* m_Window;
@@ -59,6 +67,7 @@ namespace Cyber {
 		PyObject* m_PyCyber_Camera = nullptr;
 		PyObject* m_PyCyber_SpriteRenderer = nullptr;
 		PyObject* m_PyCyber_Script = nullptr;
+		std::vector<Hotkey> m_Hotkeys;
 		std::filesystem::path m_Path;
 	};
 }

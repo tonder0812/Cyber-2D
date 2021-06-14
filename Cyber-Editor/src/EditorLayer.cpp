@@ -18,7 +18,10 @@
 #include "Utils/Utils.h"
 
 namespace Cyber {
+	EditorLayer* EditorLayer::_this;
 	void EditorLayer::onAttach() {
+		m_CurrentFile = "";
+		EditorLayer::_this = this;
 		FramebufferSpecification fbSpec;
 		fbSpec.Attachments = {
 			FramebufferTextureFormat::RGBA8,
@@ -43,6 +46,23 @@ namespace Cyber {
 			m_CurrentScene = new Scene();
 		}
 		m_SceneHierarchyPanel.SetContext(m_CurrentScene);
+		Application::Get().RegisterHotkey({ []() {return EditorLayer::_this->NewScene(); },CB_KEY_N,CB_MOD_CONTROL });
+		Application::Get().RegisterHotkey({ []() {return EditorLayer::_this->OpenScene(); },CB_KEY_O,CB_MOD_CONTROL });
+		Application::Get().RegisterHotkey({ []() {return EditorLayer::_this->SaveScene(); },CB_KEY_S,CB_MOD_CONTROL });
+		Application::Get().RegisterHotkey({ []() {return EditorLayer::_this->SaveSceneAs(); },CB_KEY_S,CB_MOD_CONTROL | CB_MOD_SHIFT });
+
+		Application::Get().RegisterHotkey({ []() {
+			if (EditorLayer::_this->m_Runtime) return false;
+			EditorLayer::_this->m_WillOpenSettings = true;
+			return true;
+		},CB_KEY_COMMA,CB_MOD_CONTROL });
+
+		Application::Get().RegisterHotkey({ []() {
+			if (EditorLayer::_this->m_Runtime) return false;
+			EditorLayer::_this->m_Runtime = true;
+			return true;
+		},CB_KEY_P,CB_MOD_CONTROL });
+
 	}
 
 	void EditorLayer::onDetach() {
@@ -63,7 +83,10 @@ namespace Cyber {
 			{
 				if (ImGui::MenuItem("New", "Ctrl+N")) NewScene();
 				if (ImGui::MenuItem("Open...", "Ctrl+O")) OpenScene();
+				ImGui::Separator();
+				if (ImGui::MenuItem("Save", "Ctrl+S")) SaveScene();
 				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) SaveSceneAs();
+				ImGui::Separator();
 				if (ImGui::MenuItem("Settings", "Ctrl+,")) openSettings = true;
 				if (ImGui::MenuItem("Exit", "Alt+F4")) Application::Get().Close();
 				ImGui::EndMenu();
@@ -71,8 +94,10 @@ namespace Cyber {
 
 			ImGui::EndMenuBar();
 		}
-		if (openSettings)
+		if (openSettings || m_WillOpenSettings) {
+			m_WillOpenSettings = false;
 			ImGui::OpenPopup("Settings");
+		}
 		bool True = true;
 		ImGui::SetNextWindowSize({ Application::Get().GetWindow()->GetWidth() * 0.5f,Application::Get().GetWindow()->GetHeight() * 0.7f });
 		if (ImGui::BeginPopupModal("Settings", &True, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar))
@@ -111,6 +136,7 @@ namespace Cyber {
 		ImGui::Text("Hovered id: %d", m_HoveredEntity ? m_HoveredEntity : -1);
 		ImGui::Text("Hovered entity: %s", m_HoveredEntity ? (m_HoveredEntity.GetComponent<TagComponent>().Id.c_str()) : "");
 		ImGui::Text("CWD: %s", Application::Get().getCWD().string().c_str());
+		ImGui::Text("Current Scene File: %s", m_CurrentFile.c_str());
 		ImGui::End();
 #endif
 
@@ -121,7 +147,7 @@ namespace Cyber {
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 		auto viewportOffset = ImGui::GetWindowPos();
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-		if (viewportPanelSize.x / (16.0f/9.0f) < viewportPanelSize.y) {
+		if (viewportPanelSize.x / (16.0f / 9.0f) < viewportPanelSize.y) {
 			m_ViewportSizeScene = { viewportPanelSize.x, viewportPanelSize.x / (16.0f / 9.0f) };
 		}
 		else {
@@ -277,10 +303,11 @@ namespace Cyber {
 			m_CurrentScene->OnUpdateEditor(ts, m_EditorCamera, cameraTexture);
 		}
 		glm::vec2 mouse = Input::GetMousePositionViewport();
-		if (mouse.x >= 0 && mouse.y >= 0 && mouse.x < m_ViewportSize.x && mouse.y < m_ViewportSize.y) {
+		if (!m_Runtime && mouse != m_Pmouse && mouse.x >= 0 && mouse.y >= 0 && mouse.x < m_ViewportSize.x && mouse.y < m_ViewportSize.y) {
 			int pixelData = m_Framebuffer->ReadPixel(1, mouse.x, m_ViewportSize.y - mouse.y);
 			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_CurrentScene);
 		}
+		m_Pmouse = mouse;
 		m_Framebuffer->Unbind();
 	}
 
@@ -360,7 +387,7 @@ namespace Cyber {
 				m_GizmoType = -1;
 				m_HoveredEntity = Entity();
 				SceneSerializer ss(*m_CurrentScene);
-				ss.Serialize(Application::Get().getPath().string() + "\\temp\\temp.cyber");
+				ss.Serialize(Application::Get().getPath().string() + "\\temp\\temp.cyber", true);
 				m_Runtime = true;
 			}
 		}
@@ -370,18 +397,21 @@ namespace Cyber {
 		ImGui::PopStyleVar();
 	}
 
-	void EditorLayer::NewScene()
+	bool EditorLayer::NewScene()
 	{
-		m_Runtime = false;
+		if (m_Runtime) return false;
 		m_CurrentScene = new Scene();
 		m_CurrentScene->OnViewportResize((uint32_t)m_ViewportSizeScene.x, (uint32_t)m_ViewportSizeScene.y);
 		m_SceneHierarchyPanel.SetContext(m_CurrentScene);
+		m_CurrentFile = "";
+		return true;
 	}
 
-	void EditorLayer::OpenScene()
+	bool EditorLayer::OpenScene()
 	{
 		//m_Runtime = false;
-		std::string filepath = FileDialogs::OpenFile("Scene (*.cyber)\0*.cyber\0",true);
+		if (m_Runtime) return false;
+		std::string filepath = FileDialogs::OpenFile("Scene (*.cyber)\0*.cyber\0", true);
 		if (!filepath.empty())
 		{
 			delete m_CurrentScene;
@@ -389,20 +419,36 @@ namespace Cyber {
 			m_CurrentScene->OnViewportResize((uint32_t)m_ViewportSizeScene.x, (uint32_t)m_ViewportSizeScene.y);
 			m_SceneHierarchyPanel.SetContext(m_CurrentScene);
 
-			SceneSerializer serializer(*m_CurrentScene);
+			SceneSerializer serializer(*(m_CurrentScene));
 			serializer.Deserialize(filepath);
+			m_CurrentFile = filepath;
 		}
+		return true;
 	}
 
-	void EditorLayer::SaveSceneAs()
+	bool EditorLayer::SaveScene()
 	{
+		if (m_Runtime) return false;
+
+		if (m_CurrentFile.empty()) return SaveSceneAs();
+
+		SceneSerializer serializer(*(m_CurrentScene));
+		serializer.Serialize(m_CurrentFile);
+		std::filesystem::current_path(std::filesystem::path(m_CurrentFile).parent_path());
+	}
+
+	bool EditorLayer::SaveSceneAs()
+	{
+		if (m_Runtime) return false;
 		std::string filepath = FileDialogs::SaveFile("Cyber Scene (*.cyber)\0*.cyber\0");
 		if (!filepath.empty())
 		{
-			SceneSerializer serializer(*m_CurrentScene);
+			SceneSerializer serializer(*(m_CurrentScene));
 			serializer.Serialize(filepath);
 			std::filesystem::current_path(std::filesystem::path(filepath).parent_path());
+			m_CurrentFile = filepath;
 		}
+		return true;
 	}
 
 	void EditorLayer::StartDockspace()

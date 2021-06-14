@@ -9,7 +9,7 @@ namespace Cyber {
 	public:
 		SceneSerializer(Scene& scene);
 
-		void Serialize(const std::string& filepath);
+		void Serialize(const std::string& filepath, bool useAbsolutePaths = false);
 		bool Deserialize(const std::string& filepath);
 	private:
 		Scene& m_Scene;

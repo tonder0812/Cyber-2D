@@ -104,6 +104,20 @@ namespace Cyber {
 				m_Window->onUpdate();*/
 				break;
 			}
+			case EventType::KeyPressed: {
+				const KeyPressedEvent* ev = dynamic_cast<const KeyPressedEvent*>(e);
+				bool consumed = false;
+				for (const Hotkey& hotkey : m_Hotkeys) {
+					if (hotkey.key == ev->key && hotkey.mods == ev->mods) {
+						consumed |= hotkey.func();
+					}
+				}
+				if (consumed) {
+					delete e;
+					return;
+				}
+				break;
+			}
 			default:
 				break;
 			}
