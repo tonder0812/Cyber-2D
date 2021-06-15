@@ -2,6 +2,7 @@
 **/bin/
 !vendor/bin/premake/
 bin-int/
+Build/
 
 # Log files
 *.log

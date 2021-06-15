@@ -210,7 +210,7 @@ Entities:
     SpriteRendererComponent:
       Color: [0.999991417, 1, 0.999989986, 1]
       UseTexture: true
-      Texture: assets\textures\Flappy bird\bluebird-upflap.png
+      Texture: assets\textures\Flappy bird\redbird-midflap.png
     ScriptComponent:
       Name: flappy
   - Entity: Main Camera
@@ -227,7 +227,7 @@ Entities:
         Size: 20
         Near: -1
         Far: 1
-        AspectRatio: 1.77663231
+        AspectRatio: 1.77623761
       Primary: true
       FixedAspectRatio: false
   - Entity: Background 2
