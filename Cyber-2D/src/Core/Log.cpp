@@ -34,7 +34,8 @@ namespace Cyber {
 	void Log::Init()
 	{
 		std::vector<spdlog::sink_ptr> logSinks;
-		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Cyber.log", true));
+		std::string path = (std::filesystem::current_path() / "Cyber.log").string();
+		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(path, true));
 		logSinks.emplace_back(std::make_shared<VectorSink>(s_Contents));
 
 		logSinks[0]->set_pattern("[%T] [%l] %n: %v");

@@ -5,6 +5,11 @@
 extern Cyber::Application* CreateAplication(int argc, char** argv);
 
 int main(int argc, char** argv) {
+	std::filesystem::path exePath = std::filesystem::path(argv[0]).parent_path();
+	if (exePath.is_relative()) {
+		exePath = std::filesystem::canonical(exePath);
+	}
+	std::filesystem::current_path(exePath);
 	Cyber::Log::Init();
 #ifndef CB_CONSOLE
     HWND consoleWnd = GetConsoleWindow();

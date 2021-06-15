@@ -17,7 +17,29 @@ namespace Cyber {
 		m_Framebuffer = new Framebuffer(fbSpec);
 		m_CurrentScene = new Scene(true);
 		SceneSerializer ss = SceneSerializer(*m_CurrentScene);
-		ss.Deserialize("./index.cyber");
+
+		for (auto s : Application::Get().GetArgs()) {
+			CB_WARN(s);
+		}
+		if (Application::Get().GetArgs().size() > 1) {
+
+			std::filesystem::path filePath(Application::Get().GetArgs()[1]);
+			std::filesystem::path appPath;
+			if (filePath.is_absolute()) {
+				appPath = filePath;
+			}
+			else {
+				appPath = std::filesystem::canonical(Application::Get().getCWD() / Application::Get().GetArgs()[1]);
+			}
+			//CB_INFO(appPath.parent_path().string());
+			//CB_INFO(std::filesystem::current_path().string());
+
+			//std::filesystem::current_path(appPath.parent_path());
+			ss.Deserialize(Application::Get().GetArgs()[1]);
+		}
+		else {
+			ss.Deserialize("./index.cyber");
+		}
 	}
 	void StandAloneLayer::onDetach()
 	{
