@@ -34,7 +34,7 @@ namespace Cyber {
 			//CB_INFO(appPath.parent_path().string());
 			//CB_INFO(std::filesystem::current_path().string());
 
-			//std::filesystem::current_path(appPath.parent_path());
+			std::filesystem::current_path(appPath.parent_path());
 			ss.Deserialize(Application::Get().GetArgs()[1]);
 		}
 		else {

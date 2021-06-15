@@ -36,11 +36,12 @@ namespace Cyber {
 		PlayButton = std::make_shared<Texture>(Application::Get().getPath().string() + "\\assets\\textures\\Play.png");
 		if (Application::Get().GetArgs().size() > 1) {
 			m_CurrentScene = new Scene(true);
-			m_CurrentScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_CurrentScene->OnViewportResize((uint32_t)m_ViewportSizeScene.x, (uint32_t)m_ViewportSizeScene.y);
 			m_SceneHierarchyPanel.SetContext(m_CurrentScene);
-
-			SceneSerializer serializer(*m_CurrentScene);
+			std::filesystem::current_path(std::filesystem::canonical(Application::Get().GetArgs()[1]).parent_path());
+			SceneSerializer serializer(*(m_CurrentScene));
 			serializer.Deserialize(Application::Get().GetArgs()[1]);
+			m_CurrentFile = Application::Get().GetArgs()[1];
 		}
 		else {
 			m_CurrentScene = new Scene();
